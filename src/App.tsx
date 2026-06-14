@@ -1,0 +1,49 @@
+import { useMemo, useState } from "react";
+import { Activity, CalendarDays, HeartPulse, Home, MessageCircle, type LucideIcon } from "lucide-react";
+import { BottomNav } from "./components/BottomNav";
+import { CoachInsight } from "./components/CoachInsight";
+import { Dashboard } from "./components/Dashboard";
+import { PainTracker } from "./components/PainTracker";
+import { TrainingLogView } from "./components/TrainingLogView";
+import { WeeklyPlanView } from "./components/WeeklyPlanView";
+
+export type AppTab = "today" | "plan" | "logs" | "pain" | "coach";
+
+const tabs = [
+  { id: "today", label: "今日", icon: Home },
+  { id: "plan", label: "課表", icon: CalendarDays },
+  { id: "logs", label: "紀錄", icon: Activity },
+  { id: "pain", label: "疼痛", icon: HeartPulse },
+  { id: "coach", label: "教練", icon: MessageCircle }
+] satisfies Array<{ id: AppTab; label: string; icon: LucideIcon }>;
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState<AppTab>("today");
+
+  const activeScreen = useMemo(() => {
+    switch (activeTab) {
+      case "plan":
+        return <WeeklyPlanView />;
+      case "logs":
+        return <TrainingLogView />;
+      case "pain":
+        return <PainTracker />;
+      case "coach":
+        return <CoachInsight />;
+      case "today":
+      default:
+        return <Dashboard onOpenPlan={() => setActiveTab("plan")} />;
+    }
+  }, [activeTab]);
+
+  return (
+    <div className="min-h-svh bg-background text-ink">
+      <main className="mx-auto min-h-svh w-full max-w-[430px] px-5 pb-[calc(96px+env(safe-area-inset-bottom))] pt-5">
+        <div key={activeTab} className="enter-up">
+          {activeScreen}
+        </div>
+      </main>
+      <BottomNav tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+    </div>
+  );
+}
