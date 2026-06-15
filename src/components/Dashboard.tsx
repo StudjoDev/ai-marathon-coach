@@ -96,6 +96,8 @@ export function Dashboard({
   const latestLog = trainingLogs[trainingLogs.length - 1];
   const nextRace = getNextRace(races);
   const primaryRace = races.find((race) => race.category === "A");
+  const baldCypressRace = races.find((race) => race.id === "taoyuan-bald-cypress-2026-11k");
+  const garminRun = races.find((race) => race.id === "garmin-run-2026-taipei-5k");
   const tigerRun = races.find((race) => race.id === "tigerrun-2026-10k");
   const sportTaiwan = races.find((race) => race.id === "sportaiwan-thanksgiving-2026-10k");
   const latestPainEntry = readPainEntries().sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id))[0];
@@ -269,6 +271,15 @@ export function Dashboard({
               className={getRaceCategoryStyle(primaryRace.category)}
             />
           ) : null}
+          {baldCypressRace ? (
+            <RaceMiniCard
+              title="半馬後恢復賽"
+              label={`${formatRaceDate(baldCypressRace.date)}｜${getRacePriorityLabel(baldCypressRace.category)}`}
+              value={`${baldCypressRace.shortName} ${formatRaceDistance(baldCypressRace.distanceKm)}`}
+              note="板橋後 14 天，不追個人最佳"
+              className={getRaceCategoryStyle(baldCypressRace.category)}
+            />
+          ) : null}
           {tigerRun && sportTaiwan ? (
             <RaceMiniCard
               title="近期風險提醒"
@@ -280,6 +291,32 @@ export function Dashboard({
           ) : null}
         </div>
       </section>
+
+      {primaryRace && baldCypressRace && garminRun ? (
+        <Card className="border-warning/30 bg-warning/10">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <Badge tone="warning">11 月賽事密集提醒</Badge>
+              <h2 className="mt-2 text-lg font-bold">半馬後 14 天落羽松，再 7 天 Garmin</h2>
+            </div>
+            <AlertTriangle className="h-5 w-5 shrink-0 text-warning" />
+          </div>
+          <div className="mt-3 grid gap-2 text-sm">
+            {[
+              "11/08 板橋半馬 21K｜A 賽",
+              "11/22 桃園落羽松 11K｜C 賽｜半馬後恢復景觀跑",
+              "11/29 Garmin 5K｜C 賽"
+            ].map((item) => (
+              <p key={item} className="rounded-card bg-white/80 px-3 py-2 font-semibold leading-5">
+                {item}
+              </p>
+            ))}
+          </div>
+          <p className="mt-3 text-sm font-semibold leading-6 text-warning">
+            請勿連續拼成績；如果 11/22 跑後疼痛超過 48 小時，11/29 Garmin 改為輕鬆跑或評估不出賽。
+          </p>
+        </Card>
+      ) : null}
 
       <Card>
         <div className="flex items-center justify-between">

@@ -6,7 +6,8 @@ const currentJudgement = [
   { label: "週二、週三對調已完成", tone: "success" as const },
   { label: "週四不能保留 5K，必須改成恢復日", tone: "warning" as const },
   { label: "膝蓋疼痛仍需要觀察", tone: "warning" as const },
-  { label: "右大腿後側酸痛時，不做衝刺與重訓", tone: "warning" as const }
+  { label: "右大腿後側酸痛時，不做衝刺與重訓", tone: "warning" as const },
+  { label: "11/22 桃園落羽松是半馬後恢復景觀跑，不當測驗賽", tone: "warning" as const }
 ];
 
 const strategy = [
@@ -29,6 +30,14 @@ const upgradeRules = [
   "8K 前就開始痛，本週視為恢復週，不增加距離。",
   "疼痛超過 48 小時仍有 4/10 以上，暫停跑步，改恢復訓練。",
   "配速不是本週成功標準，安全完成才是。"
+];
+
+const novemberRules = [
+  "11/08 板橋半馬 21K 是 A 賽，賽後先恢復，不急著再拼。",
+  "11/22 桃園落羽松 11K 是 C 賽，定位是半馬後恢復景觀跑。",
+  "11/22 前 3K 保守，全程維持能聊天的強度。",
+  "11/22 若膝蓋痛達 4/10 以上，改走跑；右大腿後側刺痛或拉扯就停止加速。",
+  "11/22 跑後必填疼痛紀錄；若疼痛超過 48 小時，11/29 Garmin 改輕鬆跑或評估不出賽。"
 ];
 
 export function CoachInsight() {
@@ -115,6 +124,23 @@ export function CoachInsight() {
         <div className="mt-3 space-y-3">
           {upgradeRules.map((rule) => (
             <p key={rule} className="rounded-card bg-surface-soft px-3 py-2 text-sm leading-5">
+              {rule}
+            </p>
+          ))}
+        </div>
+      </Card>
+
+      <Card className="border-warning/30 bg-warning/10">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <Badge tone="warning">11 月賽事密集</Badge>
+            <h2 className="mt-2 text-lg font-bold">板橋後 14 天落羽松，再 7 天 Garmin</h2>
+          </div>
+          <AlertTriangle className="h-5 w-5 text-warning" />
+        </div>
+        <div className="mt-3 space-y-3">
+          {novemberRules.map((rule) => (
+            <p key={rule} className="rounded-card bg-white/80 px-3 py-2 text-sm font-semibold leading-5">
               {rule}
             </p>
           ))}

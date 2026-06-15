@@ -19,8 +19,8 @@ const guides: Array<{
   },
   {
     category: "C",
-    title: "本案例：Garmin Run、SporTaiwan",
-    items: ["輔助賽或恢復賽", "不影響主要訓練", "不應該硬拼"]
+    title: "本案例：桃園落羽松、Garmin Run、SporTaiwan",
+    items: ["輔助賽或恢復賽", "不影響主要訓練", "桃園落羽松是半馬後景觀跑，不當測驗賽"]
   }
 ];
 

@@ -47,6 +47,7 @@ export function RaceDetailModal({
     race.signupUrl ? { label: "報名頁", href: race.signupUrl } : null,
     race.backupInfoUrl ? { label: "備用資訊", href: race.backupInfoUrl } : null
   ].filter((link): link is { label: string; href: string } => link !== null);
+  const isPostHalfRecoveryRace = race.id === "taoyuan-bald-cypress-2026-11k";
 
   return createPortal(
     <div
@@ -77,6 +78,11 @@ export function RaceDetailModal({
               <span className="inline-flex rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-bold text-success">
                 {getRaceRegistrationLabel(race.registrationStatus)}
               </span>
+              {isPostHalfRecoveryRace ? (
+                <span className="inline-flex rounded-full border border-warning/30 bg-warning/10 px-2.5 py-1 text-xs font-bold text-warning">
+                  半馬後恢復賽
+                </span>
+              ) : null}
             </div>
             <h2 className="mt-3 text-2xl font-bold leading-tight">{race.name}</h2>
           </div>

@@ -19,8 +19,8 @@ const phases = [
   {
     title: "階段三：賽後恢復與速度維持",
     range: "11/09 - 11/29",
-    focus: "半馬後恢復、短距離輕鬆測速",
-    races: ["11/29 Garmin Run 臺北站 5K"],
+    focus: "半馬後 14 天先恢復景觀跑，再依膝蓋狀態決定 Garmin 5K 強度",
+    races: ["11/22 桃園落羽松 11K", "11/29 Garmin Run 臺北站 5K"],
     isPrimary: false
   },
   {

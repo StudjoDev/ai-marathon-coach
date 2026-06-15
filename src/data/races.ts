@@ -81,6 +81,47 @@ export const races: Race[] = [
     ]
   },
   {
+    id: "taoyuan-bald-cypress-2026-11k",
+    name: "2026 桃園落羽松秘境馬拉松賽",
+    shortName: "桃園落羽松",
+    date: "2026-11-22",
+    dayOfWeek: "星期日",
+    distanceKm: 11,
+    category: "C",
+    registrationStatus: "registered",
+    city: "桃園市",
+    venue: "龍岡森林公園",
+    location: "桃園市龍岡森林公園",
+    locationDetail: "桃園市龍岡森林公園，龍慈路與龍岡路三段交接處",
+    checkInType: "郵寄報到",
+    checkInNote: "官方寫明本活動一律採郵寄報到，2026/11/10 前將物資配送至報名地址。收到物資後請核對組別、號碼布與晶片。",
+    assemblyTime: "05:00-05:30",
+    bagDropInfo: "05:00-05:30 選手報到、選手寄物",
+    startTime: "06:40",
+    finishLimit: "2 小時",
+    officialUrl: "https://www.ctrun.com.tw/Activity?EventMain_ID=318",
+    sourceStatus: "official_confirmed",
+    sourceNote: "官方頁已確認活動日期 2026/11/22、地點、11K 勇腳競賽組、郵寄報到、當天集合寄物、06:40 起跑與限時 2 小時。",
+    goal: "板橋半馬後恢復景觀跑，穩定完賽並觀察膝蓋狀態",
+    strategy: [
+      "本場不追個人最佳。",
+      "前 3K 保守跑。",
+      "全程維持能聊天的強度。",
+      "若膝蓋疼痛達 4/10 以上，改走跑。",
+      "跑後填寫膝蓋與右大腿後側疼痛紀錄。"
+    ],
+    warnings: [
+      "官方距離是 11K，不是 10K。",
+      "本場距離 11/08 板橋半馬只有 14 天，不建議全力跑。",
+      "本場距離 11/29 Garmin 5K 只有 7 天，避免累積疲勞。",
+      "當天 05:00-05:30 就有報到/寄物流程，建議提早抵達。"
+    ],
+    notes: [
+      "C 賽定位是半馬後恢復景觀跑，不當作 11K 測驗賽。",
+      "若右大腿後側出現刺痛或拉扯感，不再加速。"
+    ]
+  },
+  {
     id: "garmin-run-2026-taipei-5k",
     name: "2026 Garmin Run 馬拉松系列賽 - 臺北站",
     shortName: "Garmin 5K",

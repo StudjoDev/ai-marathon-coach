@@ -47,7 +47,10 @@ export function RaceSchedule() {
         {sortedRaces.map((race) => {
           const expanded = expandedIds.has(race.id);
           const isNextRace = nextRace?.id === race.id;
-          const isHighLoadRace = race.id === "tigerrun-2026-10k" || race.id === "sportaiwan-thanksgiving-2026-10k";
+          const isHighLoadRace =
+            race.id === "tigerrun-2026-10k" ||
+            race.id === "sportaiwan-thanksgiving-2026-10k";
+          const isPostHalfRecoveryRace = race.id === "taoyuan-bald-cypress-2026-11k";
           const daysUntil = getDaysUntilRace(race.date);
 
           return (
@@ -79,6 +82,8 @@ export function RaceSchedule() {
                   <div className="flex flex-wrap items-center gap-2">
                     {isNextRace ? <Badge tone="success">下一場</Badge> : null}
                     {isHighLoadRace ? <Badge tone="warning">高負荷連賽週</Badge> : null}
+                    {isPostHalfRecoveryRace ? <Badge tone="warning">半馬後 14 天</Badge> : null}
+                    {isPostHalfRecoveryRace ? <Badge tone="muted">半馬後恢復賽</Badge> : null}
                     <span
                       className={cn(
                         "inline-flex rounded-full border px-2.5 py-1 text-xs font-bold",
