@@ -39,7 +39,12 @@ export type PainEntry = {
 
 export type RaceCategory = "A" | "B" | "C";
 
-export type RaceStatus = "confirmed" | "pending";
+export type RaceRegistrationStatus = "registered" | "planned" | "watching";
+
+export type RaceSourceStatus =
+  | "official_event_page_confirmed"
+  | "official_registration_page_confirmed"
+  | "public_event_page_confirmed_partial";
 
 export type Race = {
   id: string;
@@ -48,15 +53,19 @@ export type Race = {
   dayOfWeek: string;
   distanceKm: number;
   category: RaceCategory;
+  registrationStatus: RaceRegistrationStatus;
   location: string;
   venue: string;
   city: string;
   reportTime: string;
   startTime: string;
+  officialUrl: string;
+  signupUrl?: string;
+  backupInfoUrl?: string;
+  sourceStatus: RaceSourceStatus;
   goal: string;
   strategy: string;
   notes: string[];
-  status: RaceStatus;
 };
 
 export type RaceChecklistGroup = {

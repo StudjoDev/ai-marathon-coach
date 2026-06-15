@@ -1,12 +1,14 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { CalendarDays, Clock, MapPin, X } from "lucide-react";
+import { CalendarDays, Clock, ExternalLink, MapPin, X } from "lucide-react";
 import type { Race } from "../types";
 import {
   formatRaceDate,
   formatRaceDistance,
   getRaceCategoryStyle,
   getRacePriorityLabel,
+  getRaceRegistrationLabel,
+  getRaceSourceStatusLabel,
   getRaceStrategyById
 } from "../utils/raceUtils";
 import { RaceChecklist } from "./RaceChecklist";
@@ -35,6 +37,11 @@ export function RaceDetailModal({
   if (!race) return null;
 
   const strategyItems = getRaceStrategyById(race.id);
+  const raceLinks = [
+    { label: "官方公告", href: race.officialUrl },
+    race.signupUrl ? { label: "報名頁", href: race.signupUrl } : null,
+    race.backupInfoUrl ? { label: "備用資訊", href: race.backupInfoUrl } : null
+  ].filter((link): link is { label: string; href: string } => link !== null);
 
   return (
     <div
@@ -51,14 +58,19 @@ export function RaceDetailModal({
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-line" />
         <div className="flex items-start justify-between gap-4">
           <div>
-            <span
-              className={cn(
-                "inline-flex rounded-full border px-2.5 py-1 text-xs font-bold",
-                getRaceCategoryStyle(race.category)
-              )}
-            >
-              {getRacePriorityLabel(race.category)}
-            </span>
+            <div className="flex flex-wrap gap-2">
+              <span
+                className={cn(
+                  "inline-flex rounded-full border px-2.5 py-1 text-xs font-bold",
+                  getRaceCategoryStyle(race.category)
+                )}
+              >
+                {getRacePriorityLabel(race.category)}
+              </span>
+              <span className="inline-flex rounded-full border border-success/30 bg-success/10 px-2.5 py-1 text-xs font-bold text-success">
+                {getRaceRegistrationLabel(race.registrationStatus)}
+              </span>
+            </div>
             <h2 className="mt-3 text-2xl font-bold leading-tight">{race.name}</h2>
           </div>
           <button
@@ -76,6 +88,7 @@ export function RaceDetailModal({
           <InfoRow icon={<MapPin className="h-4 w-4" />} label="地點" value={race.location} />
           <InfoRow icon={<MapPin className="h-4 w-4" />} label="會場" value={race.venue} />
           <InfoRow icon={<Clock className="h-4 w-4" />} label="報到 / 開跑" value={`${race.reportTime} / ${race.startTime}`} />
+          <InfoRow icon={<ExternalLink className="h-4 w-4" />} label="資料來源" value={getRaceSourceStatusLabel(race.sourceStatus)} />
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-3">
@@ -85,9 +98,27 @@ export function RaceDetailModal({
           </div>
           <div className="rounded-card bg-surface-soft px-3 py-3">
             <p className="text-xs font-semibold text-muted">狀態</p>
-            <p className="mt-1 text-base font-bold">已確認</p>
+            <p className="mt-1 text-base font-bold">{getRaceRegistrationLabel(race.registrationStatus)}</p>
           </div>
         </div>
+
+        <section className="mt-5">
+          <p className="text-xs font-bold text-muted">官方連結</p>
+          <div className="mt-2 grid gap-2">
+            {raceLinks.map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noreferrer"
+                className="flex min-h-11 items-center justify-between gap-3 rounded-card border border-line bg-white px-3 py-2 text-sm font-bold text-primary transition hover:border-primary/30 hover:bg-surface-soft"
+              >
+                <span>{link.label}</span>
+                <ExternalLink className="h-4 w-4 shrink-0" />
+              </a>
+            ))}
+          </div>
+        </section>
 
         <section className="mt-6">
           <p className="text-xs font-bold text-muted">本場目標</p>

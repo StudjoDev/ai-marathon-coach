@@ -9,7 +9,9 @@ import {
   getDaysUntilRace,
   getNextRace,
   getRaceCategoryStyle,
-  getRacePriorityLabel
+  getRacePriorityLabel,
+  getRaceRegistrationLabel,
+  getRaceSourceStatusLabel
 } from "../utils/raceUtils";
 import { RaceDetailModal } from "./RaceDetailModal";
 import { RacePriorityGuide } from "./RacePriorityGuide";
@@ -98,9 +100,14 @@ export function RaceSchedule() {
                 <InfoLine icon={<Clock className="h-4 w-4" />} text={`報到 ${race.reportTime}｜開跑 ${race.startTime}`} />
               </div>
 
-              <div className="mt-4 flex items-center justify-between rounded-card bg-surface-soft px-3 py-2">
+              <div className="mt-4 flex items-center justify-between gap-3 rounded-card bg-surface-soft px-3 py-2">
                 <span className="text-sm font-bold">{formatRaceDistance(race.distanceKm)}</span>
-                <span className="text-xs font-semibold text-muted">已確認</span>
+                <div className="text-right">
+                  <p className="text-xs font-bold text-success">{getRaceRegistrationLabel(race.registrationStatus)}</p>
+                  <p className="mt-0.5 text-[11px] font-semibold leading-4 text-muted">
+                    {getRaceSourceStatusLabel(race.sourceStatus)}
+                  </p>
+                </div>
               </div>
 
               {expanded ? (

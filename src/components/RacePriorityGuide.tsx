@@ -9,17 +9,17 @@ const guides: Array<{
 }> = [
   {
     category: "A",
-    title: "本案例：11/08 板橋半馬 21K",
+    title: "本案例：11/08 板橋馬拉松 21K",
     items: ["年度主要目標賽", "本週期訓練高峰", "需要賽前減量調整"]
   },
   {
     category: "B",
-    title: "本案例：永慶盃、虎航",
+    title: "本案例：永慶盃、TigerRun",
     items: ["重要測驗賽", "用來驗證訓練成果", "不一定全力"]
   },
   {
     category: "C",
-    title: "本案例：Garmin、SporTaiwan",
+    title: "本案例：Garmin Run、SporTaiwan",
     items: ["輔助賽或恢復賽", "不影響主要訓練", "不應該硬拼"]
   }
 ];

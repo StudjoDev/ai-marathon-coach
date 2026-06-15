@@ -32,8 +32,8 @@ export function Dashboard({
   const latestLog = trainingLogs[trainingLogs.length - 1];
   const nextRace = getNextRace(races);
   const primaryRace = races.find((race) => race.category === "A");
-  const tigerRun = races.find((race) => race.id === "tigerrun-2026");
-  const sportTaiwan = races.find((race) => race.id === "sportaiwan-2026");
+  const tigerRun = races.find((race) => race.id === "tigerrun-2026-10k");
+  const sportTaiwan = races.find((race) => race.id === "sportaiwan-thanksgiving-2026-10k");
 
   return (
     <div className="space-y-4">
