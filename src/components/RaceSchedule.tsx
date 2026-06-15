@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { AlertTriangle, CalendarDays, ChevronDown, ChevronUp, Clock, MapPin, Trophy } from "lucide-react";
+import { AlertTriangle, CalendarDays, ChevronDown, ChevronUp, Clock, ExternalLink, MapPin, Trophy } from "lucide-react";
 import { races } from "../data/races";
 import type { Race } from "../types";
 import {
@@ -134,7 +134,18 @@ export function RaceSchedule() {
                 </div>
               ) : null}
 
-              <div className="mt-4 grid grid-cols-[1fr_auto] gap-2">
+              <div className="mt-4 grid grid-cols-[1fr_1fr_auto] gap-2">
+                <a
+                  href={race.officialUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={(event) => event.stopPropagation()}
+                  className="flex min-h-11 items-center justify-center gap-2 rounded-card border border-primary/30 bg-white px-3 py-2 text-sm font-bold text-primary transition hover:bg-primary/10"
+                  aria-label={`${race.name} 官方網站`}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  官方網站
+                </a>
                 <button
                   type="button"
                   onClick={(event) => {

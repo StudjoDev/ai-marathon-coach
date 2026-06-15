@@ -43,7 +43,7 @@ export function RaceDetailModal({
   if (!race) return null;
 
   const raceLinks = [
-    { label: "官方公告", href: race.officialUrl },
+    { label: "官方網站", href: race.officialUrl },
     race.signupUrl ? { label: "報名頁", href: race.signupUrl } : null,
     race.backupInfoUrl ? { label: "備用資訊", href: race.backupInfoUrl } : null
   ].filter((link): link is { label: string; href: string } => link !== null);
@@ -88,6 +88,29 @@ export function RaceDetailModal({
           >
             <X className="h-5 w-5" />
           </button>
+        </div>
+
+        <div className="mt-4 grid gap-2">
+          <a
+            href={race.officialUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="flex min-h-12 items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary/90"
+          >
+            <ExternalLink className="h-4 w-4" />
+            前往官方網站
+          </a>
+          {race.signupUrl ? (
+            <a
+              href={race.signupUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex min-h-11 items-center justify-center gap-2 rounded-card border border-line bg-white px-4 py-2 text-sm font-bold text-primary transition hover:border-primary/30 hover:bg-surface-soft"
+            >
+              <ExternalLink className="h-4 w-4" />
+              前往報名頁
+            </a>
+          ) : null}
         </div>
 
         <div className="mt-5 grid gap-3 text-sm">
