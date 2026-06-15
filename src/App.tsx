@@ -7,6 +7,7 @@ import { PainTracker } from "./components/PainTracker";
 import { RaceSchedule } from "./components/RaceSchedule";
 import { TrainingLogView } from "./components/TrainingLogView";
 import { WeeklyPlanView } from "./components/WeeklyPlanView";
+import { appMeta } from "./data/appMeta";
 
 export type AppTab = "today" | "plan" | "races" | "logs" | "pain" | "coach";
 
@@ -71,6 +72,11 @@ export default function App() {
   return (
     <div className="min-h-svh bg-background text-ink">
       <main className="mx-auto min-h-svh w-full max-w-[430px] px-5 pb-[calc(96px+env(safe-area-inset-bottom))] pt-5">
+        <div className="mb-3 flex justify-end">
+          <span className="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] font-bold text-muted shadow-card">
+            版本 {appMeta.version}
+          </span>
+        </div>
         <div key={activeTab} className="enter-up">
           {activeScreen}
         </div>
