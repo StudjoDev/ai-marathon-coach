@@ -1,6 +1,6 @@
 # AI 半馬教練
 
-手機優先的 AI 馬拉松教練 MVP。第一版針對單一女跑者，使用靜態資料、簡單規則與 localStorage 疼痛紀錄，協助判斷本週是否該增加距離或維持恢復。
+手機優先的 AI 馬拉松教練 MVP。第一版針對單一女跑者，使用靜態資料、簡單規則與瀏覽器本機疼痛紀錄，協助判斷本週是否該增加距離或維持恢復。
 
 ## 功能
 
@@ -8,7 +8,7 @@
 - 課表：6/14 到 6/20 一日一卡課表，含本週調整摘要
 - 賽事：賽事時間軸、A/B/C 定位、報到與寄物提醒、詳情彈窗、賽前檢查清單
 - 紀錄：最近三次訓練、距離趨勢、平均心率趨勢
-- 疼痛：膝蓋與右大腿後側疼痛追蹤，資料存於 localStorage
+- 疼痛：膝蓋與右大腿後側疼痛追蹤，資料存於瀏覽器本機
 - 教練：靜態規則產生的每日教練建議與長跑升級判斷
 
 ## 本機啟動
@@ -23,8 +23,21 @@ npm run dev
 ## 建置
 
 ```bash
+npm run test
 npm run build
 npm run preview
+```
+
+GitHub Pages base path 預覽：
+
+```bash
+npm run preview:pages
+```
+
+開啟：
+
+```txt
+http://127.0.0.1:4173/ai-marathon-coach/
 ```
 
 ## 部署到 GitHub Pages
@@ -32,10 +45,43 @@ npm run preview
 專案已設定 GitHub Pages workflow：
 
 - `vite.config.ts` 的 `base` 為 `/ai-marathon-coach/`
-- push 到 `main` branch 後會自動執行 `npm ci` 與 `npm run build`
+- push 到 `main` branch 後會自動執行 `npm ci` 與 `npm run qa`
 - build 成功後會將 `dist` 部署到 GitHub Pages
 
 若 GitHub repo 名稱不是 `ai-marathon-coach`，請同步調整 `vite.config.ts` 的 `base`。
+
+部署前 QA checklist：
+
+- `git status --short` 只包含預期變更
+- 更新 `src/data/appMeta.ts` 的 `version` 與 `releaseNote`
+- 執行 `npm ci`
+- 執行 `npm run qa`
+- 執行 `npm run preview:pages`，打開 `/ai-marathon-coach/`
+- 手動檢查：今日、課表、疼痛、紀錄、賽事、教練六個 tab
+- 手動檢查：賽事詳情彈窗、官方連結、疼痛紀錄新增/編輯/刪除、右上角版本號
+- 瀏覽器 console 不應有錯誤
+
+GitHub Pages cache 驗證：
+
+- Repo Settings > Pages 的 Source 應為 `GitHub Actions`
+- push 後等待 deploy job 成功
+- 用帶版號 query 的網址檢查最新版：
+
+```txt
+https://studjodev.github.io/ai-marathon-coach/?v=v2026.06.15.7
+```
+
+- 右上角版本必須等於 `src/data/appMeta.ts`
+- 若仍看到舊版，請用無痕視窗或 hard refresh；Vite 已處理 JS/CSS hash，主要要確認入口頁沒有載入舊快取
+
+## 版本策略
+
+- `package.json` 使用 SemVer，例如 `0.1.1`
+- `src/data/appMeta.ts` 使用部署可見版號，例如 `v2026.06.15.7`
+- 每次公開部署都更新 `appMeta.version` 與 `releaseNote`
+- 只改資料或文案：patch
+- 新增頁面或資料結構：minor
+- 不相容本機儲存或資料格式變更：major
 
 ## 修改跑者資料
 
@@ -60,16 +106,16 @@ src/data/weeklyPlan.ts
 `weeklyPlanAdjustment` 記錄本週調整原因與變更項目，目前內容為：
 
 - 週二改為臀肌與穩定訓練
-- 週三改為 Easy Run 4K
-- 週四取消 Easy Run 5K，改為長跑前恢復日
-- 週五改為 Long Run 8-9K
+- 週三改為輕鬆跑 4K
+- 週四取消輕鬆跑 5K，改為長跑前恢復日
+- 週五改為長跑 8-9K
 - 週六改為跑後恢復日
 
-首頁與週課表目前固定以 2026-06-14 這週呈現。
+首頁與週課表會用瀏覽器本地日期判斷「今天」並 highlight 對應課表；本週資料仍維持 2026-06-14 到 2026-06-20 這一週。
 
 ## 疼痛紀錄規則
 
-疼痛資料存在瀏覽器 localStorage：
+疼痛資料存在瀏覽器本機儲存：
 
 ```txt
 ai-marathon-coach:painLogs
@@ -79,8 +125,8 @@ ai-marathon-coach:painLogs
 
 目前提醒規則：
 
-- 任一紀錄膝蓋疼痛達 5 分以上：本週不建議增加距離
-- 連續 2 天膝蓋疼痛達 5 分以上：建議暫停跑步，改恢復訓練
+- 任一紀錄膝蓋疼痛達 5/10 以上：本週不建議增加距離
+- 連續 2 天膝蓋疼痛達 5/10 以上：建議暫停跑步，改恢復訓練
 - 最新紀錄膝蓋疼痛達 4 分以上：本週不建議再跑步，週六請改恢復日
 - 最新紀錄右大腿後側疼痛達 4 分以上：避免衝刺、深蹲與硬舉
 - 膝蓋與右大腿後側都在 2 分以下，且樓梯正常、沒有刺痛或拉扯感：下週可考慮恢復 10-11K 長跑
@@ -137,7 +183,7 @@ src/data/races.ts
 
 - 單一跑者
 - 靜態資料
-- localStorage 疼痛紀錄
+- 瀏覽器本機疼痛紀錄
 - GitHub Pages 部署
 
 下一階段：

@@ -1,3 +1,4 @@
+import { useId } from "react";
 import type { ReactNode } from "react";
 import {
   Activity,
@@ -54,7 +55,7 @@ export function TrainingLogView() {
         title="距離趨勢"
         icon={<LineChartIcon className="h-5 w-5 text-primary" />}
         dataKey="distanceKm"
-        color="#2F6F64"
+        color="var(--color-chart-distance)"
         unit="K"
       />
 
@@ -62,7 +63,7 @@ export function TrainingLogView() {
         title="平均心率趨勢"
         icon={<HeartPulse className="h-5 w-5 text-danger" />}
         dataKey="avgHr"
-        color="#B94040"
+        color="var(--color-chart-heart-rate)"
         unit="下/分"
       />
 
@@ -101,38 +102,74 @@ function TrendCard({
   color: string;
   unit: string;
 }) {
+  const titleId = useId();
+  const summaryId = useId();
+  const values = chartData.map((item) => item[dataKey]);
+  const first = chartData[0];
+  const last = chartData[chartData.length - 1];
+  const max = Math.max(...values);
+  const min = Math.min(...values);
+  const summary = `${title}：從 ${first.date} 的 ${first[dataKey]} ${unit} 到 ${last.date} 的 ${last[dataKey]} ${unit}，區間最高 ${max} ${unit}，最低 ${min} ${unit}。`;
+
   return (
     <Card>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">{title}</h2>
-        {icon}
-      </div>
-      <div className="h-[180px] w-full min-w-0">
-        <ResponsiveContainer width="100%" height="100%" minWidth={0}>
-          <LineChart data={chartData} margin={{ top: 8, right: 8, bottom: 0, left: -22 }}>
-            <CartesianGrid stroke="#DDE5DE" strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fill: "#6F7974", fontSize: 12 }} />
-            <YAxis tickLine={false} axisLine={false} tick={{ fill: "#6F7974", fontSize: 12 }} />
-            <Tooltip
-              formatter={(value) => [`${value} ${unit}`, title]}
-              labelFormatter={(label) => `日期 ${label}`}
-              contentStyle={{
-                borderRadius: 8,
-                border: "1px solid #DDE5DE",
-                boxShadow: "0 10px 30px rgba(29,49,42,0.08)"
-              }}
-            />
-            <Line
-              type="monotone"
-              dataKey={dataKey}
-              stroke={color}
-              strokeWidth={3}
-              dot={{ r: 4, fill: color, strokeWidth: 0 }}
-              activeDot={{ r: 5 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
-      </div>
+      <figure aria-labelledby={titleId} aria-describedby={summaryId}>
+        <div className="mb-3 flex items-center justify-between gap-3">
+          <h2 id={titleId} className="text-lg font-bold">{title}</h2>
+          {icon}
+        </div>
+        <p id={summaryId} className="mb-2 text-sm leading-5 text-muted">
+          {summary} 目前只有三筆資料，趨勢僅供觀察。
+        </p>
+        <div className="h-[180px] w-full min-w-0">
+          <ResponsiveContainer width="100%" height="100%" minWidth={0}>
+            <LineChart
+              accessibilityLayer
+              aria-label={summary}
+              data={chartData}
+              margin={{ top: 8, right: 8, bottom: 0, left: -22 }}
+            >
+              <CartesianGrid stroke="var(--color-chart-grid)" strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fill: "var(--color-chart-muted)", fontSize: 12 }} />
+              <YAxis tickLine={false} axisLine={false} tick={{ fill: "var(--color-chart-muted)", fontSize: 12 }} />
+              <Tooltip
+                formatter={(value) => [`${value} ${unit}`, title]}
+                labelFormatter={(label) => `日期 ${label}`}
+                contentStyle={{
+                  borderRadius: 8,
+                  border: "1px solid var(--color-line)",
+                  boxShadow: "var(--shadow-tooltip)"
+                }}
+              />
+              <Line
+                type="monotone"
+                dataKey={dataKey}
+                stroke={color}
+                strokeWidth={3}
+                dot={{ r: 4, fill: color, strokeWidth: 0 }}
+                activeDot={{ r: 5 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <table className="sr-only">
+          <caption>{title}資料表</caption>
+          <thead>
+            <tr>
+              <th>日期</th>
+              <th>{title}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {chartData.map((item) => (
+              <tr key={`${title}-${item.date}`}>
+                <td>{item.date}</td>
+                <td>{item[dataKey]} {unit}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </figure>
     </Card>
   );
 }

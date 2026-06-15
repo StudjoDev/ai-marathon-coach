@@ -14,9 +14,9 @@ export type AppTab = "today" | "plan" | "races" | "logs" | "pain" | "coach";
 const tabs = [
   { id: "today", label: "今日", icon: Home },
   { id: "plan", label: "課表", icon: CalendarDays },
-  { id: "races", label: "賽事", icon: Flag },
-  { id: "logs", label: "紀錄", icon: Activity },
   { id: "pain", label: "疼痛", icon: HeartPulse },
+  { id: "logs", label: "紀錄", icon: Activity },
+  { id: "races", label: "賽事", icon: Flag },
   { id: "coach", label: "教練", icon: MessageCircle }
 ] satisfies Array<{ id: AppTab; label: string; icon: LucideIcon }>;
 
@@ -49,10 +49,8 @@ export default function App() {
         return (
           <PainTracker
             initialDate={painInitialDate}
-            onAfterSave={() => {
-              setPainInitialDate(undefined);
-              setActiveTab("today");
-            }}
+            onOpenCoach={() => setActiveTab("coach")}
+            onOpenToday={() => setActiveTab("today")}
           />
         );
       case "coach":
@@ -71,9 +69,13 @@ export default function App() {
 
   return (
     <div className="min-h-svh bg-background text-ink">
-      <main className="mx-auto min-h-svh w-full max-w-[430px] px-5 pb-[calc(96px+env(safe-area-inset-bottom))] pt-5">
+      <main className="mx-auto min-h-svh w-full max-w-[430px] px-5 pb-[calc(104px+env(safe-area-inset-bottom))] pt-5">
         <div className="mb-3 flex justify-end">
-          <span className="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] font-bold text-muted shadow-card">
+          <span
+            className="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] font-bold text-muted shadow-card"
+            title={appMeta.releaseNote}
+            aria-label={`目前版本 ${appMeta.version}，${appMeta.releaseNote}`}
+          >
             版本 {appMeta.version}
           </span>
         </div>

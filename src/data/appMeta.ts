@@ -1,4 +1,4 @@
 export const appMeta = {
-  version: "v2026.06.15.6",
-  releaseNote: "新增桃園落羽松 11K"
+  version: "v2026.06.15.7",
+  releaseNote: "UX 全面提升：動態今日、賽事互動、疼痛流程"
 };

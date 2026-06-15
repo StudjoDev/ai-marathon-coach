@@ -45,7 +45,7 @@ export type PainLocation =
   | "膝蓋內側"
   | "膝蓋下方"
   | "大腿後側"
-  | "屁股外側";
+  | "臀部外側";
 
 export type PainEntry = {
   id: string;

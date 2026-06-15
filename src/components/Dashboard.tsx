@@ -12,7 +12,10 @@ import {
 import { races } from "../data/races";
 import { runnerProfile } from "../data/runnerProfile";
 import { trainingLogs } from "../data/trainingLogs";
-import type { PainEntry } from "../types";
+import { weeklyPlan, weeklyPlanAdjustment } from "../data/weeklyPlan";
+import type { PainEntry, WeeklyPlanDay } from "../types";
+import { formatChineseDate, todayInputValue } from "../utils/dateUtils";
+import { getPainGuidance, sortPainEntries } from "../utils/painRules";
 import {
   formatRaceDate,
   formatRaceDistance,
@@ -21,10 +24,9 @@ import {
   getRaceCategoryStyle,
   getRacePriorityLabel
 } from "../utils/raceUtils";
-import { Badge, Card, Metric } from "./common";
+import { Badge, Card, HealthBoundaryNote, Metric } from "./common";
 
 const PAIN_STORAGE_KEY = "ai-marathon-coach:painLogs";
-const LONG_RUN_DATE = "2026-06-19";
 
 function readPainEntries(): PainEntry[] {
   if (typeof window === "undefined") return [];
@@ -58,30 +60,15 @@ function readPainEntries(): PainEntry[] {
   }
 }
 
-function painFeedback(entry: PainEntry) {
-  const feedback: string[] = [];
+function getTodayPlan(todayKey: string) {
+  const todayPlan = weeklyPlan.find((day) => day.date === todayKey);
+  if (todayPlan) return todayPlan;
 
-  if (entry.kneePain >= 4) {
-    feedback.push("本週不建議再跑步，週六請改恢復日。");
-  }
+  return weeklyPlan.find((day) => day.date > todayKey) ?? weeklyPlan[weeklyPlan.length - 1];
+}
 
-  if (entry.backThighPain >= 4) {
-    feedback.push("腿後側負荷偏高，避免衝刺、深蹲與硬舉。");
-  }
-
-  if (entry.kneePain <= 2 && entry.backThighPain <= 2 && entry.stairsNormal && !entry.sharpOrPulling) {
-    feedback.push("本週長跑完成良好，下週可考慮恢復 10-11K 長跑。");
-  }
-
-  if (entry.sharpOrPulling) {
-    feedback.push("有刺痛或拉扯感時，不把距離往上加，先讓腿後側恢復。");
-  }
-
-  if (feedback.length === 0) {
-    feedback.push("先維持恢復週，不用急著補跑或加距離。");
-  }
-
-  return feedback;
+function planBadge(plan: WeeklyPlanDay, todayKey: string) {
+  return plan.date === todayKey ? `今天 ${formatChineseDate(plan.date)}` : `下一課 ${formatChineseDate(plan.date)}`;
 }
 
 export function Dashboard({
@@ -93,19 +80,22 @@ export function Dashboard({
   onOpenRaces: () => void;
   onOpenPain: (date: string) => void;
 }) {
+  const todayKey = todayInputValue();
+  const todayPlan = getTodayPlan(todayKey);
+  const longRun = weeklyPlan.find((day) => day.type === "long") ?? todayPlan;
   const latestLog = trainingLogs[trainingLogs.length - 1];
   const nextRace = getNextRace(races);
   const primaryRace = races.find((race) => race.category === "A");
   const baldCypressRace = races.find((race) => race.id === "taoyuan-bald-cypress-2026-11k");
-  const garminRun = races.find((race) => race.id === "garmin-run-2026-taipei-5k");
   const tigerRun = races.find((race) => race.id === "tigerrun-2026-10k");
   const sportTaiwan = races.find((race) => race.id === "sportaiwan-thanksgiving-2026-10k");
-  const latestPainEntry = readPainEntries().sort((a, b) => b.date.localeCompare(a.date) || b.id.localeCompare(a.id))[0];
-  const latestFeedback = latestPainEntry ? painFeedback(latestPainEntry) : [];
+  const painEntries = sortPainEntries(readPainEntries());
+  const latestPainEntry = painEntries[0];
+  const painGuidance = getPainGuidance(painEntries);
 
   return (
     <div className="space-y-4">
-      <header className="rounded-card bg-primary px-5 py-5 text-white shadow-card">
+      <Card className="border-primary/40 bg-primary text-white shadow-raised">
         <div className="flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-medium text-white/75">{runnerProfile.name}</p>
@@ -115,105 +105,101 @@ export function Dashboard({
             {runnerProfile.status}
           </span>
         </div>
-        <p className="mt-4 text-sm leading-6 text-white/82">{runnerProfile.currentFocus}</p>
-        <div className="mt-4 grid grid-cols-3 gap-2 text-sm">
-          <div>
-            <p className="text-white/60">目標</p>
-            <p className="font-bold">{runnerProfile.goal}</p>
-          </div>
-          <div>
-            <p className="text-white/60">訓練</p>
-            <p className="font-bold">每週 {runnerProfile.weeklyTrainingDays} 天</p>
-          </div>
-          <div>
-            <p className="text-white/60">長跑</p>
-            <p className="font-bold">{runnerProfile.longRunDay}</p>
-          </div>
+        <div className="mt-5 rounded-card bg-white/12 px-3 py-3">
+          <Badge tone="muted">今日任務</Badge>
+          <h2 className="mt-3 text-2xl font-bold">{todayPlan.title}</h2>
+          <p className="mt-2 text-sm leading-6 text-white/82">{todayPlan.purpose}</p>
         </div>
-      </header>
+      </Card>
 
       <Card>
         <div className="flex items-center justify-between gap-3">
           <div>
-            <Badge tone="success">6/14 週日</Badge>
-            <h2 className="mt-3 text-xl font-bold">今日：恢復日</h2>
+            <Badge tone="success">{planBadge(todayPlan, todayKey)}</Badge>
+            <h2 className="mt-3 text-xl font-bold">今天做這幾件事</h2>
           </div>
           <Footprints className="h-8 w-8 text-success" />
         </div>
         <div className="mt-4 grid grid-cols-2 gap-2 text-sm font-semibold text-ink">
-          {["散步 30-60 分鐘", "熱敷膝蓋", "大腿後側輕伸展", "不跑步"].map((item) => (
+          {todayPlan.items.slice(0, 4).map((item) => (
             <div key={item} className="rounded-card bg-surface-soft px-3 py-2">
               {item}
             </div>
           ))}
         </div>
-        <p className="mt-3 text-sm text-muted">昨天完成 11.01K，今天只做恢復，不補跑。</p>
+        <p className="mt-3 rounded-card bg-warning/10 px-3 py-2 text-sm font-semibold leading-5 text-warning">
+          注意：{todayPlan.attention}
+        </p>
       </Card>
+
+      <Card className="border-warning/30 bg-warning/10">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <Badge tone={latestPainEntry ? "warning" : "muted"}>
+              {latestPainEntry ? "最新疼痛回饋" : "尚未填疼痛"}
+            </Badge>
+            <h2 className="mt-2 text-lg font-bold">
+              {latestPainEntry ? "教練根據疼痛紀錄更新建議" : "跑後先補一筆身體回饋"}
+            </h2>
+          </div>
+          <AlertTriangle className="h-5 w-5 shrink-0 text-warning" />
+        </div>
+        <div className="mt-3 grid gap-2">
+          {painGuidance.slice(0, 3).map((item) => (
+            <p key={item.text} className="rounded-card bg-white/80 px-3 py-2 text-sm font-semibold leading-5">
+              {item.text}
+            </p>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={() => onOpenPain(latestPainEntry?.date ?? longRun.date)}
+          className="focus-ring mt-4 flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary/90 active:scale-[0.99]"
+        >
+          <CheckCircle2 className="h-4 w-4" />
+          {latestPainEntry ? "查看疼痛紀錄" : "新增疼痛紀錄"}
+        </button>
+      </Card>
+
+      <HealthBoundaryNote />
 
       <Card className="border-primary/20 bg-primary/5">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <Badge tone="primary">調整完成</Badge>
-            <h2 className="mt-2 text-lg font-bold">本週課表已調整</h2>
+            <Badge tone="primary">本週主線</Badge>
+            <h2 className="mt-2 text-lg font-bold">長跑安全完成，比距離漂亮更重要</h2>
           </div>
-          <CalendarDays className="h-5 w-5 shrink-0 text-primary" />
+          <Gauge className="h-6 w-6 shrink-0 text-primary" />
         </div>
         <div className="mt-3 grid gap-2 text-sm leading-5">
-          {[
-            "週二改為臀肌與穩定訓練。",
-            "週三改為 Easy Run 4K。",
-            "週四取消 Easy Run 5K，改為長跑前恢復日。",
-            "週五改跑 Long Run 8-9K。",
-            "週六改為跑後恢復日，不補跑。"
-          ].map((item) => (
+          {weeklyPlanAdjustment.changes.slice(0, 3).map((item) => (
             <p key={item} className="rounded-card bg-white/80 px-3 py-2 font-semibold">
               {item}
             </p>
           ))}
         </div>
-      </Card>
-
-      <Card className="border-success/30 bg-success/10">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <Badge tone="success">週五長跑</Badge>
-            <h2 className="mt-2 text-xl font-bold">Long Run 8-9K</h2>
-            <p className="mt-2 text-sm leading-6 text-muted">
-              建議配速 7'50-8'40/km，全程要能聊天。膝蓋痛到 4/10 以上就停止跑步改走路。
-            </p>
-          </div>
-          <Gauge className="h-6 w-6 shrink-0 text-success" />
+        <p className="mt-3 text-sm leading-6 text-muted">
+          {longRun.displayDate} {longRun.title}：建議配速 {longRun.targetPace}，全程要能聊天。若疼痛達 4/10 以上，以改走路或結束當次訓練為主。
+        </p>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={onOpenPlan}
+            className="focus-ring flex min-h-11 items-center justify-center gap-2 rounded-card border border-primary/30 bg-white px-3 py-2 text-sm font-bold text-primary"
+          >
+            <CalendarDays className="h-4 w-4" />
+            看課表
+          </button>
+          <button
+            type="button"
+            onClick={() => onOpenPain(longRun.date)}
+            className="focus-ring flex min-h-11 items-center justify-center gap-2 rounded-card bg-primary px-3 py-2 text-sm font-bold text-white"
+          >
+            <CheckCircle2 className="h-4 w-4" />
+            跑後記錄
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => onOpenPain(LONG_RUN_DATE)}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary/90 active:scale-[0.99]"
-        >
-          <CheckCircle2 className="h-4 w-4" />
-          填寫跑後狀態
-        </button>
       </Card>
-
-      {latestPainEntry ? (
-        <Card>
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <Badge tone={latestPainEntry.date === LONG_RUN_DATE ? "success" : "muted"}>
-                {latestPainEntry.date === LONG_RUN_DATE ? "跑後回饋" : "最新回饋"}
-              </Badge>
-              <h2 className="mt-2 text-lg font-bold">教練根據疼痛紀錄更新建議</h2>
-            </div>
-            <AlertTriangle className="h-5 w-5 shrink-0 text-warning" />
-          </div>
-          <div className="mt-3 grid gap-2">
-            {latestFeedback.map((item) => (
-              <p key={item} className="rounded-card bg-surface-soft px-3 py-2 text-sm font-semibold leading-5">
-                {item}
-              </p>
-            ))}
-          </div>
-        </Card>
-      ) : null}
 
       {nextRace ? (
         <Card>
@@ -243,7 +229,7 @@ export function Dashboard({
           <button
             type="button"
             onClick={onOpenRaces}
-            className="mt-4 flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary/90 active:scale-[0.99]"
+            className="focus-ring mt-4 flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary/90 active:scale-[0.99]"
           >
             <CalendarDays className="h-4 w-4" />
             查看全部賽事
@@ -252,7 +238,7 @@ export function Dashboard({
       ) : null}
 
       <section className="-mx-5 overflow-x-auto px-5">
-        <div className="flex gap-3 pb-1">
+        <div className="flex snap-x snap-mandatory gap-3 pb-1">
           {nextRace ? (
             <RaceMiniCard
               title="下一場賽事"
@@ -290,9 +276,10 @@ export function Dashboard({
             />
           ) : null}
         </div>
+        <p className="mt-1 px-1 text-xs font-semibold text-muted">左右滑動查看更多賽事重點</p>
       </section>
 
-      {primaryRace && baldCypressRace && garminRun ? (
+      {primaryRace && baldCypressRace ? (
         <Card className="border-warning/30 bg-warning/10">
           <div className="flex items-start justify-between gap-3">
             <div>
@@ -301,43 +288,11 @@ export function Dashboard({
             </div>
             <AlertTriangle className="h-5 w-5 shrink-0 text-warning" />
           </div>
-          <div className="mt-3 grid gap-2 text-sm">
-            {[
-              "11/08 板橋半馬 21K｜A 賽",
-              "11/22 桃園落羽松 11K｜C 賽｜半馬後恢復景觀跑",
-              "11/29 Garmin 5K｜C 賽"
-            ].map((item) => (
-              <p key={item} className="rounded-card bg-white/80 px-3 py-2 font-semibold leading-5">
-                {item}
-              </p>
-            ))}
-          </div>
           <p className="mt-3 text-sm font-semibold leading-6 text-warning">
-            請勿連續拼成績；如果 11/22 跑後疼痛超過 48 小時，11/29 Garmin 改為輕鬆跑或評估不出賽。
+            11 月以恢復優先，不把三場都當成成績賽；若 11/22 跑後疼痛持續超過 48 小時，11/29 Garmin 建議改為輕鬆跑，並重新評估是否出賽。
           </p>
         </Card>
       ) : null}
-
-      <Card>
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-bold">本週不追距離</h2>
-          <AlertTriangle className="h-5 w-5 text-warning" />
-        </div>
-        <div className="mt-3 grid gap-2">
-          {[
-            "6/13 跑後膝蓋疼痛需要觀察。",
-            "右大腿後側酸痛，不做衝刺、深蹲與硬舉。",
-            "週四不補 5K，讓身體準備週五長跑。",
-            "週五安全完成比距離漂亮更重要。",
-            "週六不加跑，只做恢復。"
-          ].map((risk) => (
-            <div key={risk} className="flex items-start gap-2 text-sm font-medium leading-5 text-ink">
-              <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-warning" />
-              {risk}
-            </div>
-          ))}
-        </div>
-      </Card>
 
       <Card>
         <div className="flex items-start justify-between gap-3">
@@ -379,14 +334,6 @@ export function Dashboard({
             </div>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={onOpenPlan}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary/90 active:scale-[0.99]"
-        >
-          <CalendarDays className="h-4 w-4" />
-          查看本週課表
-        </button>
       </Card>
     </div>
   );
@@ -406,12 +353,12 @@ function RaceMiniCard({
   className: string;
 }) {
   return (
-    <article className="min-w-[250px] rounded-card border border-line bg-surface px-4 py-3 shadow-card">
+    <article className="min-w-[250px] snap-start rounded-card border border-line bg-surface px-4 py-3 shadow-card">
       <div className="flex items-center justify-between gap-3">
         <p className="text-xs font-bold text-muted">{title}</p>
         <span className={`rounded-full border px-2 py-1 text-[11px] font-bold ${className}`}>{label}</span>
       </div>
-      <p className="mt-3 line-clamp-2 text-base font-bold leading-6">{value}</p>
+      <p className="mt-3 text-base font-bold leading-6">{value}</p>
       <p className="mt-2 text-sm font-semibold text-muted">{note}</p>
     </article>
   );

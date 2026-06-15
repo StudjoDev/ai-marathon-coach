@@ -36,8 +36,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Build
-        run: npm run build
+      - name: QA
+        run: npm run qa
+
+      - name: Verify GitHub Pages base path
+        run: |
+          test -f dist/index.html
+          grep -q '/ai-marathon-coach/assets/' dist/index.html
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

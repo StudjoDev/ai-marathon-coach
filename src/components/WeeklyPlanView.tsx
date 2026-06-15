@@ -1,22 +1,21 @@
 import { CalendarDays, Dumbbell, Moon, ShieldCheck } from "lucide-react";
 import { weeklyPlan, weeklyPlanAdjustment } from "../data/weeklyPlan";
 import type { WeeklyPlanDay } from "../types";
+import { formatChineseDate, todayInputValue } from "../utils/dateUtils";
 import { Badge, Card, SectionHeader, cn } from "./common";
 
-const today = "2026-06-14";
-
-function planTone(day: WeeklyPlanDay) {
-  if (day.date === today) {
+function planTone(day: WeeklyPlanDay, todayKey: string) {
+  if (day.date === todayKey) {
     return {
-      badge: "今日",
-      card: "border-primary/40 bg-primary text-white",
+      badge: "今天",
+      card: "border-primary/40 bg-primary text-white shadow-raised",
       icon: <ShieldCheck className="h-5 w-5 text-white" />
     };
   }
 
   if (day.type === "long") {
     return {
-      badge: "週五長跑",
+      badge: "長跑",
       card: "border-success/30 bg-success/10",
       icon: <CalendarDays className="h-5 w-5 text-success" />
     };
@@ -24,7 +23,7 @@ function planTone(day: WeeklyPlanDay) {
 
   if (day.type === "strength") {
     return {
-      badge: "臀肌訓練",
+      badge: "肌力",
       card: "",
       icon: <Dumbbell className="h-5 w-5 text-primary" />
     };
@@ -62,9 +61,14 @@ function planTone(day: WeeklyPlanDay) {
 }
 
 export function WeeklyPlanView() {
+  const todayKey = todayInputValue();
+  const firstDay = weeklyPlan[0];
+  const lastDay = weeklyPlan[weeklyPlan.length - 1];
+  const weekLabel = `${formatChineseDate(firstDay.date)} - ${formatChineseDate(lastDay.date)}`;
+
   return (
     <div className="space-y-4">
-      <SectionHeader eyebrow="6/14 週日 - 6/20 週六" title="本週課表" />
+      <SectionHeader eyebrow={weekLabel} title="本週課表" />
 
       {weeklyPlanAdjustment.isAdjusted ? (
         <Card className="border-primary/20 bg-primary/5">
@@ -81,7 +85,7 @@ export function WeeklyPlanView() {
 
           <details className="mt-3 rounded-card bg-white/70 px-3 py-2">
             <summary className="cursor-pointer text-sm font-bold text-primary">
-              查看調整項目
+              查看調整細節
             </summary>
             <div className="mt-2 space-y-2">
               {weeklyPlanAdjustment.changes.map((change) => (
@@ -96,8 +100,8 @@ export function WeeklyPlanView() {
 
       <div className="space-y-3">
         {weeklyPlan.map((day) => {
-          const tone = planTone(day);
-          const isToday = day.date === today;
+          const tone = planTone(day, todayKey);
+          const isToday = day.date === todayKey;
           const badgeTone = day.type === "long" || day.type === "post_long_run_recovery"
             ? "success"
             : day.type === "pre_long_run_recovery"

@@ -3,6 +3,13 @@
 @tailwind utilities;
 
 :root {
+  --color-chart-distance: #2f6f64;
+  --color-chart-heart-rate: #9f5555;
+  --color-chart-grid: #dde5de;
+  --color-chart-muted: #6f7974;
+  --color-surface: #ffffff;
+  --color-line: #dde5de;
+  --shadow-tooltip: 0 10px 30px rgba(29, 49, 42, 0.08);
   color: #16231e;
   background: #f4f7f2;
   font-family:
@@ -46,6 +53,10 @@ button {
 
   .soft-card {
     @apply rounded-card border border-line bg-surface-soft;
+  }
+
+  .focus-ring {
+    @apply outline-none focus-visible:ring-2 focus-visible:ring-primary/30 focus-visible:ring-offset-2 focus-visible:ring-offset-background;
   }
 }
 

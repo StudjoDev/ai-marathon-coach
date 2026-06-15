@@ -1,12 +1,16 @@
 {
   "name": "ai-marathon-coach",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview"
+    "typecheck": "tsc -b --pretty false",
+    "test": "npm run typecheck",
+    "build": "npm run typecheck && vite build",
+    "qa": "npm run build",
+    "preview": "vite preview",
+    "preview:pages": "vite preview --host 127.0.0.1 --port 4173"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
