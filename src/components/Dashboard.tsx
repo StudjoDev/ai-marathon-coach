@@ -1,10 +1,39 @@
-import { AlertTriangle, CalendarDays, CheckCircle2, Clock, Footprints, Gauge } from "lucide-react";
+import {
+  AlertTriangle,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  Flag,
+  Footprints,
+  Gauge,
+  MapPin,
+  Trophy
+} from "lucide-react";
+import { races } from "../data/races";
 import { runnerProfile } from "../data/runnerProfile";
 import { trainingLogs } from "../data/trainingLogs";
+import {
+  formatRaceDate,
+  formatRaceDistance,
+  getDaysUntilRace,
+  getNextRace,
+  getRaceCategoryStyle,
+  getRacePriorityLabel
+} from "../utils/raceUtils";
 import { Badge, Card, Metric } from "./common";
 
-export function Dashboard({ onOpenPlan }: { onOpenPlan: () => void }) {
+export function Dashboard({
+  onOpenPlan,
+  onOpenRaces
+}: {
+  onOpenPlan: () => void;
+  onOpenRaces: () => void;
+}) {
   const latestLog = trainingLogs[trainingLogs.length - 1];
+  const nextRace = getNextRace(races);
+  const primaryRace = races.find((race) => race.category === "A");
+  const tigerRun = races.find((race) => race.id === "tigerrun-2026");
+  const sportTaiwan = races.find((race) => race.id === "sportaiwan-2026");
 
   return (
     <div className="space-y-4">
@@ -52,6 +81,72 @@ export function Dashboard({ onOpenPlan }: { onOpenPlan: () => void }) {
         </div>
         <p className="mt-3 text-sm text-muted">昨天完成 11.01K，今天只做恢復。</p>
       </Card>
+
+      {nextRace ? (
+        <Card>
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <Badge tone="success">下一場賽事</Badge>
+              <h2 className="mt-3 text-xl font-bold">{nextRace.name}</h2>
+              <p className="mt-1 text-sm font-semibold text-muted">{formatRaceDistance(nextRace.distanceKm)}｜{nextRace.venue}</p>
+            </div>
+            <div className="text-right">
+              <p className="text-4xl font-bold leading-none text-primary">{Math.max(getDaysUntilRace(nextRace.date), 0)}</p>
+              <p className="mt-1 text-xs font-bold text-muted">天</p>
+            </div>
+          </div>
+          <div className="mt-4 grid gap-2 text-sm">
+            <div className="flex items-center gap-2 rounded-card bg-surface-soft px-3 py-2">
+              <Flag className="h-4 w-4 shrink-0 text-success" />
+              <span className="font-semibold">{getRacePriorityLabel(nextRace.category)}</span>
+            </div>
+            <div className="flex items-start gap-2 rounded-card bg-surface-soft px-3 py-2">
+              <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <span className="leading-5">{nextRace.goal}</span>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onOpenRaces}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-card bg-primary px-4 py-3 text-sm font-bold text-white transition hover:bg-primary/90 active:scale-[0.99]"
+          >
+            <CalendarDays className="h-4 w-4" />
+            查看全部賽事
+          </button>
+        </Card>
+      ) : null}
+
+      <section className="-mx-5 overflow-x-auto px-5">
+        <div className="flex gap-3 pb-1">
+          {nextRace ? (
+            <RaceMiniCard
+              title="下一場賽事"
+              label={`${formatRaceDistance(nextRace.distanceKm)}｜${getRacePriorityLabel(nextRace.category)}`}
+              value={nextRace.name}
+              note="目標：穩定完賽"
+              className={getRaceCategoryStyle(nextRace.category)}
+            />
+          ) : null}
+          {primaryRace ? (
+            <RaceMiniCard
+              title="主要目標賽"
+              label={`${formatRaceDate(primaryRace.date)}｜${getRacePriorityLabel(primaryRace.category)}`}
+              value={`${primaryRace.name} ${formatRaceDistance(primaryRace.distanceKm)}`}
+              note="目標：安全完成半馬"
+              className={getRaceCategoryStyle(primaryRace.category)}
+            />
+          ) : null}
+          {tigerRun && sportTaiwan ? (
+            <RaceMiniCard
+              title="近期風險提醒"
+              label="連兩天 10K"
+              value={`${tigerRun.name} / ${sportTaiwan.name}`}
+              note="第二天不拼速度"
+              className="border-warning/30 bg-warning/10 text-warning"
+            />
+          ) : null}
+        </div>
+      </section>
 
       <Card>
         <div className="flex items-center justify-between">
@@ -116,5 +211,30 @@ export function Dashboard({ onOpenPlan }: { onOpenPlan: () => void }) {
         </button>
       </Card>
     </div>
+  );
+}
+
+function RaceMiniCard({
+  title,
+  label,
+  value,
+  note,
+  className
+}: {
+  title: string;
+  label: string;
+  value: string;
+  note: string;
+  className: string;
+}) {
+  return (
+    <article className="min-w-[250px] rounded-card border border-line bg-surface px-4 py-3 shadow-card">
+      <div className="flex items-center justify-between gap-3">
+        <p className="text-xs font-bold text-muted">{title}</p>
+        <span className={`rounded-full border px-2 py-1 text-[11px] font-bold ${className}`}>{label}</span>
+      </div>
+      <p className="mt-3 line-clamp-2 text-base font-bold leading-6">{value}</p>
+      <p className="mt-2 text-sm font-semibold text-muted">{note}</p>
+    </article>
   );
 }

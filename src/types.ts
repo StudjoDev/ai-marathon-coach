@@ -36,3 +36,32 @@ export type PainEntry = {
   locations: PainLocation[];
   note: string;
 };
+
+export type RaceCategory = "A" | "B" | "C";
+
+export type RaceStatus = "confirmed" | "pending";
+
+export type Race = {
+  id: string;
+  name: string;
+  date: string;
+  dayOfWeek: string;
+  distanceKm: number;
+  category: RaceCategory;
+  location: string;
+  venue: string;
+  city: string;
+  reportTime: string;
+  startTime: string;
+  goal: string;
+  strategy: string;
+  notes: string[];
+  status: RaceStatus;
+};
+
+export type RaceChecklistGroup = {
+  title: string;
+  items: string[];
+};
+
+export type RaceChecklistState = Record<string, Record<string, boolean>>;
