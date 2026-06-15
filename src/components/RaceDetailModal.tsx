@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { AlertTriangle, CalendarDays, Clock, ExternalLink, MapPin, X } from "lucide-react";
 import type { Race } from "../types";
 import {
@@ -23,6 +24,9 @@ export function RaceDetailModal({
   useEffect(() => {
     if (!race) return undefined;
 
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
     function handleKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         onClose();
@@ -30,7 +34,10 @@ export function RaceDetailModal({
     }
 
     window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", handleKeyDown);
+    };
   }, [race, onClose]);
 
   if (!race) return null;
@@ -41,16 +48,18 @@ export function RaceDetailModal({
     race.backupInfoUrl ? { label: "備用資訊", href: race.backupInfoUrl } : null
   ].filter((link): link is { label: string; href: string } => link !== null);
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-40 flex items-end bg-ink/36 px-3 pb-3 pt-12 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-end bg-ink/36 px-3 pb-3 pt-12 backdrop-blur-sm"
       role="dialog"
       aria-modal="true"
       aria-label={`${race.name} 詳情`}
+      data-testid="race-detail-modal"
       onClick={onClose}
     >
       <div
         className="mx-auto max-h-[88svh] w-full max-w-[430px] overflow-y-auto rounded-t-[18px] bg-surface px-5 pb-[calc(20px+env(safe-area-inset-bottom))] pt-4 shadow-[0_-18px_50px_rgba(22,35,30,0.22)]"
+        data-testid="race-detail-panel"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-line" />
@@ -180,7 +189,8 @@ export function RaceDetailModal({
           <RaceChecklist raceId={race.id} />
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
