@@ -21,6 +21,20 @@ const tabs = [
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<AppTab>("today");
+  const [painInitialDate, setPainInitialDate] = useState<string>();
+
+  function openPainTracker(date: string) {
+    setPainInitialDate(date);
+    setActiveTab("pain");
+  }
+
+  function changeTab(tab: AppTab) {
+    if (tab === "pain") {
+      setPainInitialDate(undefined);
+    }
+
+    setActiveTab(tab);
+  }
 
   const activeScreen = useMemo(() => {
     switch (activeTab) {
@@ -31,14 +45,28 @@ export default function App() {
       case "logs":
         return <TrainingLogView />;
       case "pain":
-        return <PainTracker />;
+        return (
+          <PainTracker
+            initialDate={painInitialDate}
+            onAfterSave={() => {
+              setPainInitialDate(undefined);
+              setActiveTab("today");
+            }}
+          />
+        );
       case "coach":
         return <CoachInsight />;
       case "today":
       default:
-        return <Dashboard onOpenPlan={() => setActiveTab("plan")} onOpenRaces={() => setActiveTab("races")} />;
+        return (
+          <Dashboard
+            onOpenPlan={() => setActiveTab("plan")}
+            onOpenRaces={() => setActiveTab("races")}
+            onOpenPain={openPainTracker}
+          />
+        );
     }
-  }, [activeTab]);
+  }, [activeTab, painInitialDate]);
 
   return (
     <div className="min-h-svh bg-background text-ink">
@@ -47,7 +75,7 @@ export default function App() {
           {activeScreen}
         </div>
       </main>
-      <BottomNav tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
+      <BottomNav tabs={tabs} activeTab={activeTab} onChange={changeTab} />
     </div>
   );
 }

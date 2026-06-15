@@ -52,8 +52,9 @@ export function getRaceCategoryStyle(category: RaceCategory) {
 export function getRaceRegistrationLabel(status: RaceRegistrationStatus) {
   const labels: Record<RaceRegistrationStatus, string> = {
     registered: "已報名",
-    planned: "計畫參加",
-    watching: "觀望中"
+    not_registered: "未報名",
+    waitlist: "候補中",
+    unknown: "狀態待確認"
   };
 
   return labels[status];
@@ -61,48 +62,12 @@ export function getRaceRegistrationLabel(status: RaceRegistrationStatus) {
 
 export function getRaceSourceStatusLabel(status: RaceSourceStatus) {
   const labels: Record<RaceSourceStatus, string> = {
-    official_event_page_confirmed: "官方公告已確認",
-    official_registration_page_confirmed: "官方報名頁已確認",
-    public_event_page_confirmed_partial: "公開頁已部分確認"
+    official_confirmed: "官方已確認",
+    official_confirmed_with_warning: "官方已確認，需賽前複查",
+    official_pdf_link_confirmed_manual_review_needed: "官方 PDF 需人工覆核"
   };
 
   return labels[status];
-}
-
-export function getRaceStrategyById(raceId: string) {
-  const strategies: Record<string, string[]> = {
-    "yongqing-2026-taipei": [
-      "不追個人最佳",
-      "前 3K 放慢，先確認身體狀態",
-      "觀察膝蓋是否在 8K 前後出現疼痛",
-      "完賽後記錄疼痛分數"
-    ],
-    "banqiao-marathon-2026-half": [
-      "年度主要目標賽",
-      "前 5K 保守",
-      "10K 後穩定",
-      "15K 後再決定是否加速",
-      "若膝蓋痛超過 5 分，改為完賽模式"
-    ],
-    "garmin-run-2026-taipei-5k": [
-      "半馬後恢復賽",
-      "若恢復良好可測 5K",
-      "若疲勞未消，不追速度"
-    ],
-    "tigerrun-2026-10k": [
-      "隔天還有 SporTaiwan",
-      "不建議全力",
-      "控制在 80% 努力"
-    ],
-    "sportaiwan-thanksgiving-2026-10k": [
-      "前一天已跑 10K",
-      "當恢復跑",
-      "配速比虎航慢 30-60 秒/km",
-      "若膝蓋痛，直接降速或改走跑"
-    ]
-  };
-
-  return strategies[raceId] ?? [];
 }
 
 export function formatRaceDate(date: string) {

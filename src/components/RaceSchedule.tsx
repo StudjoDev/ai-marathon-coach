@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { CalendarDays, ChevronDown, ChevronUp, Clock, MapPin, Trophy } from "lucide-react";
+import { AlertTriangle, CalendarDays, ChevronDown, ChevronUp, Clock, MapPin, Trophy } from "lucide-react";
 import { races } from "../data/races";
 import type { Race } from "../types";
 import {
@@ -47,6 +47,7 @@ export function RaceSchedule() {
         {sortedRaces.map((race) => {
           const expanded = expandedIds.has(race.id);
           const isNextRace = nextRace?.id === race.id;
+          const isHighLoadRace = race.id === "tigerrun-2026-10k" || race.id === "sportaiwan-thanksgiving-2026-10k";
           const daysUntil = getDaysUntilRace(race.date);
 
           return (
@@ -77,6 +78,7 @@ export function RaceSchedule() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     {isNextRace ? <Badge tone="success">下一場</Badge> : null}
+                    {isHighLoadRace ? <Badge tone="warning">高負荷連賽週</Badge> : null}
                     <span
                       className={cn(
                         "inline-flex rounded-full border px-2.5 py-1 text-xs font-bold",
@@ -97,7 +99,8 @@ export function RaceSchedule() {
               <div className="mt-4 grid gap-2 text-sm">
                 <InfoLine icon={<CalendarDays className="h-4 w-4" />} text={`${formatRaceDate(race.date)} ${race.dayOfWeek}`} />
                 <InfoLine icon={<MapPin className="h-4 w-4" />} text={race.location} />
-                <InfoLine icon={<Clock className="h-4 w-4" />} text={`報到 ${race.reportTime}｜開跑 ${race.startTime}`} />
+                <InfoLine icon={<Clock className="h-4 w-4" />} text={`報到 ${race.checkInType}｜集合 ${race.assemblyTime}`} />
+                <InfoLine icon={<Clock className="h-4 w-4" />} text={`開跑 ${race.startTime}｜限時 ${race.finishLimit}`} />
               </div>
 
               <div className="mt-4 flex items-center justify-between gap-3 rounded-card bg-surface-soft px-3 py-2">
@@ -115,7 +118,19 @@ export function RaceSchedule() {
                   <p className="text-xs font-bold text-muted">本場目標</p>
                   <p className="mt-1 text-sm font-semibold leading-5">{race.goal}</p>
                   <p className="mt-3 text-xs font-bold text-muted">比賽策略</p>
-                  <p className="mt-1 text-sm leading-5 text-muted">{race.strategy}</p>
+                  <div className="mt-2 grid gap-2">
+                    {race.strategy.map((item) => (
+                      <p key={item} className="rounded-card bg-surface-soft px-3 py-2 text-sm leading-5 text-muted">
+                        {item}
+                      </p>
+                    ))}
+                  </div>
+                  {race.warnings.length > 0 ? (
+                    <div className="mt-3 flex items-start gap-2 rounded-card bg-warning/10 px-3 py-2 text-sm leading-5 text-warning">
+                      <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                      <span>{race.warnings[0]}</span>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 

@@ -15,7 +15,7 @@ const guides: Array<{
   {
     category: "B",
     title: "本案例：永慶盃、TigerRun",
-    items: ["重要測驗賽", "用來驗證訓練成果", "不一定全力"]
+    items: ["重要測驗賽", "用來驗證訓練成果", "不一定全力，尤其 TigerRun 隔天還有 10K"]
   },
   {
     category: "C",

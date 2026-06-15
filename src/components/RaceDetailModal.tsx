@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import type { ReactNode } from "react";
-import { CalendarDays, Clock, ExternalLink, MapPin, X } from "lucide-react";
+import { AlertTriangle, CalendarDays, Clock, ExternalLink, MapPin, X } from "lucide-react";
 import type { Race } from "../types";
 import {
   formatRaceDate,
@@ -8,8 +8,7 @@ import {
   getRaceCategoryStyle,
   getRacePriorityLabel,
   getRaceRegistrationLabel,
-  getRaceSourceStatusLabel,
-  getRaceStrategyById
+  getRaceSourceStatusLabel
 } from "../utils/raceUtils";
 import { RaceChecklist } from "./RaceChecklist";
 import { cn } from "./common";
@@ -36,7 +35,6 @@ export function RaceDetailModal({
 
   if (!race) return null;
 
-  const strategyItems = getRaceStrategyById(race.id);
   const raceLinks = [
     { label: "官方公告", href: race.officialUrl },
     race.signupUrl ? { label: "報名頁", href: race.signupUrl } : null,
@@ -85,9 +83,13 @@ export function RaceDetailModal({
 
         <div className="mt-5 grid gap-3 text-sm">
           <InfoRow icon={<CalendarDays className="h-4 w-4" />} label="日期" value={`${formatRaceDate(race.date)} ${race.dayOfWeek}`} />
-          <InfoRow icon={<MapPin className="h-4 w-4" />} label="地點" value={race.location} />
+          <InfoRow icon={<MapPin className="h-4 w-4" />} label="地點" value={race.locationDetail} />
           <InfoRow icon={<MapPin className="h-4 w-4" />} label="會場" value={race.venue} />
-          <InfoRow icon={<Clock className="h-4 w-4" />} label="報到 / 開跑" value={`${race.reportTime} / ${race.startTime}`} />
+          <InfoRow icon={<Clock className="h-4 w-4" />} label="報到方式" value={race.checkInType} />
+          <InfoRow icon={<Clock className="h-4 w-4" />} label="報到提醒" value={race.checkInNote} />
+          <InfoRow icon={<Clock className="h-4 w-4" />} label="集合時間" value={race.assemblyTime} />
+          <InfoRow icon={<Clock className="h-4 w-4" />} label="寄物" value={race.bagDropInfo} />
+          <InfoRow icon={<Clock className="h-4 w-4" />} label="開跑 / 限時" value={`${race.startTime} / ${race.finishLimit}`} />
           <InfoRow icon={<ExternalLink className="h-4 w-4" />} label="資料來源" value={getRaceSourceStatusLabel(race.sourceStatus)} />
         </div>
 
@@ -129,14 +131,36 @@ export function RaceDetailModal({
 
         <section className="mt-5">
           <p className="text-xs font-bold text-muted">配速策略</p>
-          <p className="mt-2 text-sm leading-6 text-ink">{race.strategy}</p>
           <div className="mt-3 grid gap-2">
-            {strategyItems.map((item) => (
+            {race.strategy.map((item) => (
               <div key={item} className="rounded-card bg-surface-soft px-3 py-2 text-sm leading-5">
                 {item}
               </div>
             ))}
           </div>
+        </section>
+
+        {race.warnings.length > 0 ? (
+          <section className="mt-5">
+            <div className="mb-2 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-warning" />
+              <p className="text-xs font-bold text-muted">賽前提醒</p>
+            </div>
+            <div className="grid gap-2">
+              {race.warnings.map((warning) => (
+                <p key={warning} className="rounded-card bg-warning/10 px-3 py-2 text-sm font-semibold leading-5 text-warning">
+                  {warning}
+                </p>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        <section className="mt-5">
+          <p className="text-xs font-bold text-muted">來源備註</p>
+          <p className="mt-2 rounded-card bg-surface-soft px-3 py-3 text-sm leading-6 text-muted">
+            {race.sourceNote}
+          </p>
         </section>
 
         {race.notes.length > 0 ? (
