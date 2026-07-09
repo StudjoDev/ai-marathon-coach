@@ -1,27 +1,23 @@
 import { useMemo, useState } from "react";
-import { Activity, CalendarDays, Flag, HeartPulse, Home, MessageCircle, type LucideIcon } from "lucide-react";
+import { CalendarDays, Flag, HeartPulse, Home, type LucideIcon } from "lucide-react";
 import { BottomNav } from "./components/BottomNav";
-import { CoachInsight } from "./components/CoachInsight";
 import { Dashboard } from "./components/Dashboard";
 import { PainTracker } from "./components/PainTracker";
 import { RaceSchedule } from "./components/RaceSchedule";
-import { TrainingLogView } from "./components/TrainingLogView";
 import { WeeklyPlanView } from "./components/WeeklyPlanView";
 import { appMeta } from "./data/appMeta";
 
-export type AppTab = "today" | "plan" | "races" | "logs" | "pain" | "coach";
+export type AppTab = "memo" | "races" | "plan" | "pain";
 
 const tabs = [
-  { id: "today", label: "今日", icon: Home },
-  { id: "plan", label: "課表", icon: CalendarDays },
-  { id: "pain", label: "疼痛", icon: HeartPulse },
-  { id: "logs", label: "紀錄", icon: Activity },
+  { id: "memo", label: "備忘", icon: Home },
   { id: "races", label: "賽事", icon: Flag },
-  { id: "coach", label: "教練", icon: MessageCircle }
+  { id: "plan", label: "課表", icon: CalendarDays },
+  { id: "pain", label: "疼痛", icon: HeartPulse }
 ] satisfies Array<{ id: AppTab; label: string; icon: LucideIcon }>;
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<AppTab>("today");
+  const [activeTab, setActiveTab] = useState<AppTab>("memo");
   const [painInitialDate, setPainInitialDate] = useState<string>();
 
   function openPainTracker(date: string) {
@@ -39,23 +35,19 @@ export default function App() {
 
   const activeScreen = useMemo(() => {
     switch (activeTab) {
-      case "plan":
-        return <WeeklyPlanView />;
       case "races":
         return <RaceSchedule />;
-      case "logs":
-        return <TrainingLogView />;
+      case "plan":
+        return <WeeklyPlanView />;
       case "pain":
         return (
           <PainTracker
             initialDate={painInitialDate}
-            onOpenCoach={() => setActiveTab("coach")}
-            onOpenToday={() => setActiveTab("today")}
+            onOpenCoach={() => setActiveTab("memo")}
+            onOpenToday={() => setActiveTab("memo")}
           />
         );
-      case "coach":
-        return <CoachInsight />;
-      case "today":
+      case "memo":
       default:
         return (
           <Dashboard

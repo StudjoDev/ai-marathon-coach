@@ -21,6 +21,24 @@ const baseChecklistGroups: RaceChecklistGroup[] = [
 ];
 
 function getRaceSpecificChecklistGroups(race: Race): RaceChecklistGroup[] {
+  if (race.id === "mt-fuji-tatta-run-2026-summer-half") {
+    return [
+      {
+        title: "本場專屬",
+        items: ["確認 TATTA App 已登入", "確認活動已出現在 App 內", "分次累積完成，不單次硬跑半馬"]
+      }
+    ];
+  }
+
+  if (race.id === "marie-claire-pink-run-2026-10k") {
+    return [
+      {
+        title: "本場專屬",
+        items: ["確認 10K 14:15 起跑", "賽前複查官方物資與寄物通知", "保留 11/08 板橋半馬狀態"]
+      }
+    ];
+  }
+
   if (race.id === "yongqing-2026-taipei-10_5k") {
     return [
       {

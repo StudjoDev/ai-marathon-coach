@@ -215,7 +215,7 @@ export function PainTracker({ initialDate, onOpenCoach, onOpenToday }: PainTrack
                   onClick={onOpenCoach}
                   className="focus-ring rounded-card bg-primary px-3 py-2 text-sm font-bold text-white"
                 >
-                  查看教練更新
+                  回備忘
                 </button>
                 <button
                   type="button"
@@ -414,7 +414,7 @@ export function PainTracker({ initialDate, onOpenCoach, onOpenToday }: PainTrack
                       onClick={onOpenToday}
                       className="focus-ring ml-auto inline-flex min-h-11 items-center rounded-card border border-line bg-white px-3 py-2 text-sm font-bold text-muted"
                     >
-                      回今日
+                      回備忘
                     </button>
                   ) : null}
                 </div>

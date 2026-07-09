@@ -1,4 +1,4 @@
-import type { Race, RaceCategory, RaceRegistrationStatus, RaceSourceStatus } from "../types";
+import type { Race, RaceCategory, RaceEventMode, RaceRegistrationStatus, RaceSourceStatus } from "../types";
 import { toDateOnly } from "./dateUtils";
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
@@ -7,7 +7,7 @@ export function getUpcomingRaces(raceList: Race[], today: string | Date = new Da
   const todayDate = toDateOnly(today);
 
   return [...raceList]
-    .filter((race) => toDateOnly(race.date).getTime() >= todayDate.getTime())
+    .filter((race) => toDateOnly(race.endDate ?? race.date).getTime() >= todayDate.getTime())
     .sort((a, b) => a.date.localeCompare(b.date));
 }
 
@@ -56,6 +56,7 @@ export function getRaceSourceStatusLabel(status: RaceSourceStatus) {
   const labels: Record<RaceSourceStatus, string> = {
     official_confirmed: "官方已確認",
     official_confirmed_with_warning: "官方已確認，需賽前複查",
+    official_link_blocked_backup_confirmed: "官方連結需驗證，備用資料已確認",
     official_pdf_link_confirmed_manual_review_needed: "官方 PDF 需人工覆核"
   };
 
@@ -66,8 +67,25 @@ export function formatRaceDate(date: string) {
   return date.replace(/-/g, "/");
 }
 
+export function formatRaceDateRange(race: Race) {
+  if (!race.endDate || race.endDate === race.date) {
+    return `${formatRaceDate(race.date)} ${race.dayOfWeek}`;
+  }
+
+  return `${formatRaceDate(race.date)}-${formatRaceDate(race.endDate)}`;
+}
+
 export function formatRaceDistance(distanceKm: number) {
-  return `${Number.isInteger(distanceKm) ? distanceKm.toFixed(0) : distanceKm.toFixed(1)}K`;
+  return `${Number.isInteger(distanceKm) ? distanceKm.toFixed(0) : String(distanceKm)}K`;
+}
+
+export function getRaceModeLabel(mode: RaceEventMode = "in_person") {
+  const labels: Record<RaceEventMode, string> = {
+    in_person: "實體",
+    virtual: "線上"
+  };
+
+  return labels[mode];
 }
 
 export function getRaceOfficialLinkLabel(race: Race) {
@@ -83,6 +101,14 @@ export function getRaceOfficialLinkLabel(race: Race) {
 }
 
 export function getRacePrimaryWarning(race: Race) {
+  if (race.id === "mt-fuji-tatta-run-2026-summer-half") {
+    return race.warnings.find((warning) => warning.includes("累積")) ?? race.warnings[0];
+  }
+
+  if (race.id === "marie-claire-pink-run-2026-10k") {
+    return race.warnings.find((warning) => warning.includes("板橋半馬")) ?? race.warnings[0];
+  }
+
   if (race.id === "taoyuan-bald-cypress-2026-11k") {
     return race.warnings.find((warning) => warning.includes("14 天")) ?? race.warnings[0];
   }

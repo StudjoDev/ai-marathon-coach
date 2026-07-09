@@ -65,15 +65,20 @@ export type RaceRegistrationStatus = "registered" | "not_registered" | "waitlist
 export type RaceSourceStatus =
   | "official_confirmed"
   | "official_confirmed_with_warning"
+  | "official_link_blocked_backup_confirmed"
   | "official_pdf_link_confirmed_manual_review_needed";
+
+export type RaceEventMode = "in_person" | "virtual";
 
 export type Race = {
   id: string;
   name: string;
   shortName: string;
   date: string;
+  endDate?: string;
   dayOfWeek: string;
   distanceKm: number;
+  eventMode?: RaceEventMode;
   category: RaceCategory;
   registrationStatus: RaceRegistrationStatus;
   city: string;

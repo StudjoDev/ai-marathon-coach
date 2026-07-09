@@ -1,4 +1,4 @@
 export const appMeta = {
-  version: "v2026.06.15.7",
-  releaseNote: "UX 全面提升：動態今日、賽事互動、疼痛流程"
+  version: "v2026.07.09.1",
+  releaseNote: "賽事備忘錄主導：新增富士山 TATTA 與裙襬澎澎 Run"
 };

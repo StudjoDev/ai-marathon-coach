@@ -2,6 +2,86 @@ import type { Race } from "../types";
 
 export const races: Race[] = [
   {
+    id: "mt-fuji-tatta-run-2026-summer-half",
+    name: "通往2026年富士山馬拉松之路：TATTA RUN 夏季錦標賽",
+    shortName: "富士山 TATTA",
+    date: "2026-08-08",
+    endDate: "2026-08-17",
+    dayOfWeek: "星期六至星期一",
+    distanceKm: 21.0975,
+    eventMode: "virtual",
+    category: "C",
+    registrationStatus: "registered",
+    city: "線上",
+    venue: "TATTA App",
+    location: "線上賽（TATTA GPS 累積）",
+    locationDetail: "線上賽，活動期間使用 TATTA App 或連動 GPS 手錶累積跑步距離。",
+    checkInType: "TATTA App / RUNNET ID",
+    checkInNote: "需下載 TATTA App，並確認 RUNNET ID 已連結；活動顯示後再開始累積紀錄。",
+    assemblyTime: "不限時間與地點",
+    bagDropInfo: "線上賽無寄物",
+    startTime: "2026/08/08-08/17 累積紀錄",
+    finishLimit: "10 天內累積完成",
+    officialUrl: "https://zh-tw.mtfujimarathon.com/virtual-run-summer/",
+    sourceStatus: "official_confirmed",
+    sourceNote: "官方頁確認活動期間為 2026/08/08-08/17，半程馬拉松項目為 21.0975 公里，需使用 TATTA App 累積跑步紀錄。",
+    goal: "線上累積完成 21.0975K，不把它當成單次半馬測驗。",
+    strategy: [
+      "分 2-4 次累積完成即可，不需要單次跑完半馬。",
+      "每次跑後記錄膝蓋與右大腿後側狀態。",
+      "若疼痛達 4/10 以上，停止追距離，改以恢復為主。"
+    ],
+    warnings: [
+      "這是 TATTA/GPS 累積賽，不要為了完賽單次硬跑半馬。",
+      "活動前先確認 TATTA App 已登入並能看到本活動。",
+      "只有活動期間內的跑步或越野跑紀錄才會被計入。"
+    ],
+    notes: [
+      "C 賽定位是建立參賽節奏與累積里程，不影響 11/08 板橋半馬週期。",
+      "跑步地點與時間不限，但仍需選擇安全路線。"
+    ]
+  },
+  {
+    id: "marie-claire-pink-run-2026-10k",
+    name: "2026年第十二屆美麗佳人裙襬澎澎Run",
+    shortName: "裙襬澎澎 Run",
+    date: "2026-10-31",
+    dayOfWeek: "星期六",
+    distanceKm: 10,
+    eventMode: "in_person",
+    category: "C",
+    registrationStatus: "registered",
+    city: "新北市",
+    venue: "新北大都會公園水漾啵啵廣場",
+    location: "新北市新北大都會公園水漾啵啵廣場",
+    locationDetail: "新北市三重區谷王里疏洪五路二段2761號，新北大都會公園水漾啵啵廣場。",
+    checkInType: "使用晶片不檢錄",
+    checkInNote: "10K 組使用晶片不檢錄；官方報名頁可能有驗證跳轉，賽前仍需複查物資與活動通知。",
+    assemblyTime: "建議 13:30 前到場",
+    bagDropInfo: "賽前依官方行前通知確認寄物安排",
+    startTime: "14:15",
+    finishLimit: "2 小時 20 分",
+    officialUrl: "https://bao-ming.com/eb/content/7035#33185",
+    backupInfoUrl: "https://running.biji.co/index.php?act=info&cid=13108&q=competition&subtitle=2026%E5%B9%B4%E7%AC%AC%E5%8D%81%E4%BA%8C%E5%B1%86%E7%BE%8E%E9%BA%97%E4%BD%B3%E4%BA%BA%E8%A3%99%E8%A5%AC%E6%BE%8E%E6%BE%8ERun",
+    sourceStatus: "official_link_blocked_backup_confirmed",
+    sourceNote: "官方報名頁連結保留為主連結；可讀資料由運動筆記與 EventGo 交叉確認日期、地點、10K 起跑時間與限時。",
+    goal: "板橋半馬前 8 天的氣氛賽，安全完成 10K，不追成績。",
+    strategy: [
+      "全程控制在輕鬆到穩定強度。",
+      "前 5K 不加速，避免累積疲勞。",
+      "跑後若膝蓋疼痛升高，板橋半馬前一週立即降量。"
+    ],
+    warnings: [
+      "距離 11/08 板橋半馬只有 8 天，本場不拼速度。",
+      "下午 14:15 起跑，補水與當天天氣要比早場更注意。",
+      "官方報名頁可能有驗證跳轉，賽前再用官方通知複查細節。"
+    ],
+    notes: [
+      "C 賽定位是參與與維持節奏，不作為 10K 測驗賽。",
+      "10K 路線為新北大都會公園周邊自行車道折返。"
+    ]
+  },
+  {
     id: "yongqing-2026-taipei-10_5k",
     name: "長庚紀念醫院 2026 永慶盃路跑 - 臺北場",
     shortName: "永慶盃",

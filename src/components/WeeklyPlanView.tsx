@@ -1,208 +1,129 @@
-import { CalendarDays, Dumbbell, Moon, ShieldCheck } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock } from "lucide-react";
 import { weeklyPlan, weeklyPlanAdjustment } from "../data/weeklyPlan";
 import type { WeeklyPlanDay } from "../types";
 import { formatChineseDate, todayInputValue } from "../utils/dateUtils";
 import { Badge, Card, SectionHeader, cn } from "./common";
 
-function planTone(day: WeeklyPlanDay, todayKey: string) {
-  if (day.date === todayKey) {
-    return {
-      badge: "今天",
-      card: "border-primary/40 bg-primary text-white shadow-raised",
-      icon: <ShieldCheck className="h-5 w-5 text-white" />
-    };
+function getFocusPlan(todayKey: string) {
+  return weeklyPlan.find((day) => day.date >= todayKey) ?? weeklyPlan[weeklyPlan.length - 1];
+}
+
+function planMeta(day: WeeklyPlanDay) {
+  const parts: string[] = [];
+
+  if (day.distanceKm) {
+    parts.push(day.fallbackDistanceKm ? `${day.fallbackDistanceKm}-${day.distanceKm}K` : `${day.distanceKm}K`);
   }
 
-  if (day.type === "long") {
-    return {
-      badge: "長跑",
-      card: "border-success/30 bg-success/10",
-      icon: <CalendarDays className="h-5 w-5 text-success" />
-    };
+  if (day.targetPace) {
+    parts.push(day.targetPace);
   }
 
-  if (day.type === "strength") {
-    return {
-      badge: "肌力",
-      card: "",
-      icon: <Dumbbell className="h-5 w-5 text-primary" />
-    };
-  }
+  return parts.join(" | ");
+}
 
-  if (day.type === "pre_long_run_recovery") {
-    return {
-      badge: "長跑前恢復",
-      card: "border-warning/30 bg-warning/10",
-      icon: <Moon className="h-5 w-5 text-warning" />
-    };
-  }
-
-  if (day.type === "post_long_run_recovery") {
-    return {
-      badge: "跑後恢復",
-      card: "border-success/20 bg-success/5",
-      icon: <ShieldCheck className="h-5 w-5 text-success" />
-    };
-  }
-
-  if (day.type === "easy_run" || day.type === "easy") {
-    return {
-      badge: "輕鬆跑",
-      card: "",
-      icon: <CalendarDays className="h-5 w-5 text-primary" />
-    };
-  }
-
-  return {
-    badge: day.type === "rest" ? "休息" : "恢復",
-    card: "",
-    icon: <Moon className="h-5 w-5 text-muted" />
-  };
+function planBadge(day: WeeklyPlanDay, todayKey: string) {
+  if (day.date === todayKey) return "今天";
+  if (day.type === "long") return "長跑";
+  if (day.type === "strength") return "肌力";
+  if (day.type === "rest") return "休息";
+  return "恢復";
 }
 
 export function WeeklyPlanView() {
   const todayKey = todayInputValue();
+  const focusPlan = getFocusPlan(todayKey);
   const firstDay = weeklyPlan[0];
   const lastDay = weeklyPlan[weeklyPlan.length - 1];
   const weekLabel = `${formatChineseDate(firstDay.date)} - ${formatChineseDate(lastDay.date)}`;
 
   return (
     <div className="space-y-4">
-      <SectionHeader eyebrow={weekLabel} title="本週課表" />
+      <SectionHeader eyebrow={weekLabel} title="訓練輔助" />
+
+      <Card className="border-primary/30">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <Badge tone={focusPlan.date === todayKey ? "success" : "primary"}>
+              {focusPlan.date === todayKey ? "今天" : "下一課"}
+            </Badge>
+            <h2 className="mt-3 text-2xl font-bold leading-tight">{focusPlan.title}</h2>
+            <p className="mt-2 text-sm font-semibold text-muted">
+              {focusPlan.dayLabel} {focusPlan.displayDate}
+              {planMeta(focusPlan) ? ` | ${planMeta(focusPlan)}` : ""}
+            </p>
+          </div>
+          <Clock className="h-5 w-5 shrink-0 text-primary" />
+        </div>
+
+        <p className="mt-4 rounded-card bg-surface-soft px-3 py-3 text-sm font-semibold leading-6">
+          {focusPlan.purpose}
+        </p>
+
+        <div className="mt-3 grid gap-2">
+          {focusPlan.items.slice(0, 3).map((item) => (
+            <div key={item} className="flex items-start gap-2 text-sm leading-5">
+              <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
+              <span>{item}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-4 rounded-card bg-warning/10 px-3 py-2 text-sm font-semibold leading-5 text-warning">
+          注意：{focusPlan.attention}
+        </p>
+      </Card>
 
       {weeklyPlanAdjustment.isAdjusted ? (
-        <Card className="border-primary/20 bg-primary/5">
-          <div className="flex items-start justify-between gap-3">
+        <Card density="compact">
+          <div className="flex items-start gap-3">
+            <CalendarDays className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
             <div>
-              <Badge tone="primary">調整完成</Badge>
-              <h2 className="mt-2 text-lg font-bold">本週課表已調整</h2>
-              <p className="mt-2 text-sm leading-6 text-muted">{weeklyPlanAdjustment.reason}</p>
+              <h2 className="text-lg font-bold">本週重點</h2>
+              <p className="mt-1 text-sm leading-6 text-muted">{weeklyPlanAdjustment.reason}</p>
+              <div className="mt-3 grid gap-2">
+                {weeklyPlanAdjustment.changes.slice(0, 2).map((change) => (
+                  <p key={change} className="rounded-card bg-surface-soft px-3 py-2 text-sm font-semibold leading-5">
+                    {change}
+                  </p>
+                ))}
+              </div>
             </div>
-            <span className="whitespace-nowrap text-xs font-bold text-muted">
-              {weeklyPlanAdjustment.adjustedAt}
-            </span>
           </div>
-
-          <details className="mt-3 rounded-card bg-white/70 px-3 py-2">
-            <summary className="cursor-pointer text-sm font-bold text-primary">
-              查看調整細節
-            </summary>
-            <div className="mt-2 space-y-2">
-              {weeklyPlanAdjustment.changes.map((change) => (
-                <p key={change} className="text-sm leading-5 text-ink">
-                  {change}
-                </p>
-              ))}
-            </div>
-          </details>
         </Card>
       ) : null}
 
-      <div className="space-y-3">
-        {weeklyPlan.map((day) => {
-          const tone = planTone(day, todayKey);
-          const isToday = day.date === todayKey;
-          const badgeTone = day.type === "long" || day.type === "post_long_run_recovery"
-            ? "success"
-            : day.type === "pre_long_run_recovery"
-              ? "warning"
-              : isToday
-                ? "muted"
-                : "primary";
+      <Card>
+        <h2 className="text-lg font-bold">本週課表</h2>
+        <div className="mt-3 divide-y divide-line">
+          {weeklyPlan.map((day) => {
+            const isFocus = day.date === focusPlan.date;
 
-          return (
-            <Card key={day.date} className={cn("transition", tone.card)}>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span
-                      className={cn(
-                        "text-sm font-semibold",
-                        isToday ? "text-white/75" : "text-muted"
-                      )}
-                    >
-                      {day.dayLabel} {day.displayDate}
-                    </span>
-                    <Badge tone={badgeTone}>{tone.badge}</Badge>
-                  </div>
-                  <h2 className="mt-2 text-xl font-bold">{day.title}</h2>
-                </div>
-                {tone.icon}
-              </div>
-
-              {(day.distanceKm || day.targetPace) && (
+            return (
+              <article key={day.date} className="grid grid-cols-[auto_1fr] gap-3 py-3 first:pt-0 last:pb-0">
                 <div
                   className={cn(
-                    "mt-4 grid gap-2 text-sm font-semibold sm:grid-cols-2",
-                    isToday ? "text-white" : "text-ink"
+                    "flex h-10 w-10 items-center justify-center rounded-card text-xs font-bold",
+                    isFocus ? "bg-primary text-white" : "bg-surface-soft text-muted"
                   )}
                 >
-                  {day.distanceKm ? (
-                    <div className={cn("rounded-card px-3 py-2", isToday ? "bg-white/12" : "bg-surface-soft")}>
-                      距離：{day.fallbackDistanceKm ? `${day.fallbackDistanceKm}-${day.distanceKm}K` : `${day.distanceKm}K`}
-                    </div>
-                  ) : null}
-                  {day.targetPace ? (
-                    <div className={cn("rounded-card px-3 py-2", isToday ? "bg-white/12" : "bg-surface-soft")}>
-                      建議配速：{day.targetPace}
-                    </div>
-                  ) : null}
+                  {day.dayLabel.replace("週", "")}
                 </div>
-              )}
-
-              <div
-                className={cn(
-                  "mt-4 rounded-card px-3 py-3",
-                  isToday ? "bg-white/12" : "bg-surface-soft"
-                )}
-              >
-                <p className={cn("text-xs font-semibold", isToday ? "text-white/70" : "text-muted")}>
-                  目的
-                </p>
-                <p className="mt-1 text-sm leading-5">{day.purpose}</p>
-              </div>
-
-              <div className="mt-3 grid gap-2">
-                {day.items.map((item) => (
-                  <div key={item} className="flex items-start gap-2 text-sm leading-5">
-                    <span
-                      className={cn(
-                        "mt-2 h-1.5 w-1.5 shrink-0 rounded-full",
-                        isToday ? "bg-white" : "bg-primary"
-                      )}
-                    />
-                    <span>{item}</span>
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-bold leading-5">{day.title}</h3>
+                    <Badge tone={isFocus ? "primary" : "muted"} size="xs">{planBadge(day, todayKey)}</Badge>
                   </div>
-                ))}
-              </div>
-
-              {day.successCriteria ? (
-                <div className={cn("mt-3 rounded-card px-3 py-3", isToday ? "bg-white/12" : "bg-success/10")}>
-                  <p className={cn("text-xs font-bold", isToday ? "text-white/70" : "text-success")}>
-                    成功標準
+                  <p className="mt-1 text-sm font-semibold text-muted">
+                    {day.displayDate}
+                    {planMeta(day) ? ` | ${planMeta(day)}` : ""}
                   </p>
-                  <div className="mt-2 space-y-1.5">
-                    {day.successCriteria.map((criterion) => (
-                      <p key={criterion} className="text-sm leading-5">
-                        {criterion}
-                      </p>
-                    ))}
-                  </div>
                 </div>
-              ) : null}
-
-              <p
-                className={cn(
-                  "mt-4 rounded-card px-3 py-2 text-sm font-medium",
-                  isToday ? "bg-white/12 text-white" : "bg-warning/10 text-warning"
-                )}
-              >
-                注意：{day.attention}
-              </p>
-            </Card>
-          );
-        })}
-      </div>
+              </article>
+            );
+          })}
+        </div>
+      </Card>
     </div>
   );
 }
