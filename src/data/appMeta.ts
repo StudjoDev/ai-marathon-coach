@@ -1,4 +1,4 @@
 export const appMeta = {
-  version: "v2026.07.09.2",
-  releaseNote: "賽事總表與每週行程表：取消疼痛頁與每日課表"
+  version: "v2026.07.09.3",
+  releaseNote: "行程表賽事週強化：突出賽事名稱、日期、距離與時間"
 };

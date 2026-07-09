@@ -1,5 +1,8 @@
-import { CalendarDays, CheckCircle2 } from "lucide-react";
+import { CalendarDays, CheckCircle2, Flag, Trophy } from "lucide-react";
+import { races } from "../data/races";
+import type { Race } from "../types";
 import { todayInputValue } from "../utils/dateUtils";
+import { formatRaceDistance } from "../utils/raceUtils";
 import { Badge, Card, SectionHeader, cn } from "./common";
 
 type WeeklyGoal = {
@@ -40,9 +43,40 @@ function isCurrentWeek(goal: WeeklyGoal, today: string) {
   return goal.start <= today && today <= goal.end;
 }
 
+function getRacesForWeek(goal: WeeklyGoal) {
+  return races
+    .filter((race) => race.date <= goal.end && (race.endDate ?? race.date) >= goal.start)
+    .sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function raceDateLabel(race: Race) {
+  const start = race.date.slice(5).replace("-", "/");
+  if (!race.endDate || race.endDate === race.date) {
+    return start;
+  }
+
+  return `${start}-${race.endDate.slice(5).replace("-", "/")}`;
+}
+
+function raceTimeLabel(race: Race) {
+  if (race.eventMode === "virtual") {
+    return "累積";
+  }
+
+  return race.startTime
+    .replace(" 第一波；", "/")
+    .replace(" 第二波", "")
+    .replace(/（.*$/, "");
+}
+
+function hasPrimaryRace(racesInWeek: Race[]) {
+  return racesInWeek.some((race) => race.category === "A");
+}
+
 export function WeeklyPlanView() {
   const today = todayInputValue();
   const currentGoal = weeklyGoals.find((goal) => isCurrentWeek(goal, today));
+  const currentRaces = currentGoal ? getRacesForWeek(currentGoal) : [];
 
   return (
     <div className="space-y-4">
@@ -55,16 +89,33 @@ export function WeeklyPlanView() {
       </header>
 
       {currentGoal ? (
-        <Card className="border-primary/40 shadow-raised">
+        <Card
+          className={cn(
+            "shadow-raised",
+            currentRaces.length > 0
+              ? hasPrimaryRace(currentRaces)
+                ? "border-primary/60 bg-primary/5"
+                : "border-warning/40 bg-warning/10"
+              : "border-primary/40"
+          )}
+        >
           <div className="flex items-start gap-3">
-            <CalendarDays className="mt-1 h-5 w-5 shrink-0 text-primary" />
+            {currentRaces.length > 0 ? (
+              <Trophy className="mt-1 h-5 w-5 shrink-0 text-primary" />
+            ) : (
+              <CalendarDays className="mt-1 h-5 w-5 shrink-0 text-primary" />
+            )}
             <div>
-              <Badge tone="success">本週</Badge>
+              <div className="flex flex-wrap gap-2">
+                <Badge tone="success">本週</Badge>
+                {currentRaces.length > 0 ? <Badge tone="warning" variant="outline">賽事週</Badge> : null}
+              </div>
               <h2 className="mt-3 text-2xl font-bold leading-tight">{currentGoal.focus}</h2>
               <p className="mt-1 text-sm font-semibold text-muted">{currentGoal.label}</p>
               <p className="mt-3 rounded-card bg-surface-soft px-3 py-3 text-sm font-semibold leading-6">
                 {currentGoal.minimumGoal}
               </p>
+              {currentRaces.length > 0 ? <RaceWeekBlock racesInWeek={currentRaces} /> : null}
             </div>
           </div>
         </Card>
@@ -75,31 +126,82 @@ export function WeeklyPlanView() {
         <div className="space-y-2">
           {weeklyGoals.map((goal) => {
             const active = isCurrentWeek(goal, today);
+            const racesInWeek = getRacesForWeek(goal);
+            const raceWeek = racesInWeek.length > 0;
 
             return (
               <article
                 key={goal.start}
                 className={cn(
                   "app-card grid grid-cols-[76px_1fr] gap-3 p-3",
-                  active ? "border-primary/40 bg-primary/5" : ""
+                  active ? "border-primary/40 bg-primary/5" : "",
+                  raceWeek && !active ? "border-warning/40 bg-warning/10" : "",
+                  raceWeek && hasPrimaryRace(racesInWeek) ? "border-primary/60 bg-primary/5" : ""
                 )}
               >
                 <div>
                   <p className="text-xs font-bold text-primary">{goal.label}</p>
                   {active ? <Badge tone="success" size="xs">本週</Badge> : null}
+                  {raceWeek ? (
+                    <div className="mt-2">
+                      <Badge tone={hasPrimaryRace(racesInWeek) ? "primary" : "warning"} size="xs" variant="outline">
+                        賽事
+                      </Badge>
+                    </div>
+                  ) : null}
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-base font-bold leading-5">{goal.focus}</h2>
+                  <div className="flex items-start justify-between gap-2">
+                    <h2 className="text-base font-bold leading-5">{goal.focus}</h2>
+                    {raceWeek ? <Flag className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" /> : null}
+                  </div>
                   <div className="mt-2 flex items-start gap-2 text-sm font-semibold leading-5 text-muted">
                     <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" aria-hidden="true" />
                     <span>{goal.minimumGoal}</span>
                   </div>
+                  {raceWeek ? <RaceWeekBlock racesInWeek={racesInWeek} compact /> : null}
                 </div>
               </article>
             );
           })}
         </div>
       </section>
+    </div>
+  );
+}
+
+function RaceWeekBlock({
+  racesInWeek,
+  compact = false
+}: {
+  racesInWeek: Race[];
+  compact?: boolean;
+}) {
+  return (
+    <div className={cn("grid gap-2", compact ? "mt-3" : "mt-4")}>
+      {racesInWeek.map((race) => (
+        <div
+          key={race.id}
+          className={cn(
+            "rounded-card border px-3 py-2",
+            race.category === "A"
+              ? "border-primary/40 bg-white"
+              : "border-warning/30 bg-white/80"
+          )}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[11px] font-bold text-primary">
+                {raceDateLabel(race)} | {raceTimeLabel(race)}
+              </p>
+              <p className="mt-1 text-sm font-bold leading-5 text-ink">{race.shortName}</p>
+            </div>
+            <span className="shrink-0 rounded-full bg-primary px-2 py-1 text-xs font-bold text-white">
+              {formatRaceDistance(race.distanceKm)}
+            </span>
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
