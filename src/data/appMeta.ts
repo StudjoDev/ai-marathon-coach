@@ -1,4 +1,4 @@
 export const appMeta = {
-  version: "v2026.07.09.1",
-  releaseNote: "賽事備忘錄主導：新增富士山 TATTA 與裙襬澎澎 Run"
+  version: "v2026.07.09.2",
+  releaseNote: "賽事總表與每週行程表：取消疼痛頁與每日課表"
 };

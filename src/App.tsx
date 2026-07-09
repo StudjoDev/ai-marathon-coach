@@ -1,63 +1,29 @@
 import { useMemo, useState } from "react";
-import { CalendarDays, Flag, HeartPulse, Home, type LucideIcon } from "lucide-react";
+import { CalendarDays, Flag, type LucideIcon } from "lucide-react";
 import { BottomNav } from "./components/BottomNav";
-import { Dashboard } from "./components/Dashboard";
-import { PainTracker } from "./components/PainTracker";
 import { RaceSchedule } from "./components/RaceSchedule";
 import { WeeklyPlanView } from "./components/WeeklyPlanView";
 import { appMeta } from "./data/appMeta";
 
-export type AppTab = "memo" | "races" | "plan" | "pain";
+export type AppTab = "races" | "schedule";
 
 const tabs = [
-  { id: "memo", label: "備忘", icon: Home },
   { id: "races", label: "賽事", icon: Flag },
-  { id: "plan", label: "課表", icon: CalendarDays },
-  { id: "pain", label: "疼痛", icon: HeartPulse }
+  { id: "schedule", label: "行程表", icon: CalendarDays }
 ] satisfies Array<{ id: AppTab; label: string; icon: LucideIcon }>;
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<AppTab>("memo");
-  const [painInitialDate, setPainInitialDate] = useState<string>();
-
-  function openPainTracker(date: string) {
-    setPainInitialDate(date);
-    setActiveTab("pain");
-  }
-
-  function changeTab(tab: AppTab) {
-    if (tab === "pain") {
-      setPainInitialDate(undefined);
-    }
-
-    setActiveTab(tab);
-  }
+  const [activeTab, setActiveTab] = useState<AppTab>("races");
 
   const activeScreen = useMemo(() => {
     switch (activeTab) {
-      case "races":
-        return <RaceSchedule />;
-      case "plan":
+      case "schedule":
         return <WeeklyPlanView />;
-      case "pain":
-        return (
-          <PainTracker
-            initialDate={painInitialDate}
-            onOpenCoach={() => setActiveTab("memo")}
-            onOpenToday={() => setActiveTab("memo")}
-          />
-        );
-      case "memo":
+      case "races":
       default:
-        return (
-          <Dashboard
-            onOpenPlan={() => setActiveTab("plan")}
-            onOpenRaces={() => setActiveTab("races")}
-            onOpenPain={openPainTracker}
-          />
-        );
+        return <RaceSchedule />;
     }
-  }, [activeTab, painInitialDate]);
+  }, [activeTab]);
 
   return (
     <div className="min-h-svh bg-background text-ink">
@@ -75,7 +41,7 @@ export default function App() {
           {activeScreen}
         </div>
       </main>
-      <BottomNav tabs={tabs} activeTab={activeTab} onChange={changeTab} />
+      <BottomNav tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
     </div>
   );
 }

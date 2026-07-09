@@ -76,7 +76,11 @@ export function formatRaceDateRange(race: Race) {
 }
 
 export function formatRaceDistance(distanceKm: number) {
-  return `${Number.isInteger(distanceKm) ? distanceKm.toFixed(0) : String(distanceKm)}K`;
+  if (distanceKm > 20 && distanceKm < 22) {
+    return "21K";
+  }
+
+  return `${Number.isInteger(distanceKm) ? distanceKm.toFixed(0) : distanceKm.toFixed(1)}K`;
 }
 
 export function getRaceModeLabel(mode: RaceEventMode = "in_person") {
