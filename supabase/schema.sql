@@ -54,6 +54,10 @@ create trigger race_entries_touch before update on public.race_entries
   for each row execute function public.touch_updated();
 
 -- 權限：只有登入的帳號能讀寫。請在 Authentication 設定關閉公開註冊，只建立你們兩人的帳號。
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on public.races, public.race_entries to authenticated;
+revoke all on public.races, public.race_entries from anon;
+
 alter table public.races enable row level security;
 alter table public.race_entries enable row level security;
 

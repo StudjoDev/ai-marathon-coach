@@ -231,7 +231,15 @@ export function StoreProvider({ children }: { children: ReactNode }) {
         setRaces((list) => upsertById(list, toRace(row)));
       })
       .on("postgres_changes", { event: "*", schema: "public", table: "race_entries" }, (payload) => {
-        if (payload.eventType === "DELETE") return;
+        if (payload.eventType === "DELETE") {
+          const raceId = (payload.old as Partial<EntryRow>).race_id;
+          if (!raceId) return;
+          setEntries((map) => {
+            const { [raceId]: _removed, ...rest } = map;
+            return rest;
+          });
+          return;
+        }
         const row = payload.new as EntryRow;
         if (row.updated_by && row.updated_by === userId) return;
         if (pendingTimers.current.has(row.race_id)) return;
