@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, Pencil } from "lucide-react";
+import { ArrowRight, ArrowUpRight, LogIn, Pencil } from "lucide-react";
 import { useStore } from "../data/store";
 import { href } from "../router";
 import type { Race } from "../types";
@@ -17,7 +17,7 @@ import {
 import { BigDistance, Eyebrow, Hero, Page, SectionTitle, StatRow, TopBar, cn, textAreaClass } from "./ui";
 
 export function RaceMemo({ race }: { race: Race }) {
-  const { getEntry, updateEntry } = useStore();
+  const { getEntry, updateEntry, canEdit } = useStore();
   const today = todayInputValue();
   const entry = getEntry(race.id);
   const timing = getRaceTiming(race, today);
@@ -33,13 +33,23 @@ export function RaceMemo({ race }: { race: Race }) {
         <TopBar
           back={{ href: href.list(), label: "賽事" }}
           right={
-            <a
-              href={href.edit(race.id)}
-              className="focus-ring flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-white"
-            >
-              <Pencil className="h-4 w-4" aria-hidden="true" />
-              編輯
-            </a>
+            canEdit ? (
+              <a
+                href={href.edit(race.id)}
+                className="focus-ring flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-white"
+              >
+                <Pencil className="h-4 w-4" aria-hidden="true" />
+                編輯
+              </a>
+            ) : (
+              <a
+                href={href.login()}
+                className="focus-ring flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-white"
+              >
+                <LogIn className="h-4 w-4" aria-hidden="true" />
+                登入編輯
+              </a>
+            )
           }
         />
         <div className="mt-7">
@@ -101,10 +111,14 @@ export function RaceMemo({ race }: { race: Race }) {
           {checklist.map((item) => {
             const checked = Boolean(entry.checklist[item]);
             return (
-              <label key={item} className="flex min-h-[52px] cursor-pointer items-center gap-3.5 border-b border-line">
+              <label
+                key={item}
+                className={cn("flex min-h-[52px] items-center gap-3.5 border-b border-line", canEdit && "cursor-pointer")}
+              >
                 <input
                   type="checkbox"
                   checked={checked}
+                  disabled={!canEdit}
                   onChange={() => updateEntry(race.id, { checklist: { ...entry.checklist, [item]: !checked } })}
                   className="h-[22px] w-[22px] shrink-0 accent-ink"
                 />
@@ -114,25 +128,34 @@ export function RaceMemo({ race }: { race: Race }) {
           })}
         </section>
 
-        <label htmlFor="memo" className="mb-2.5 mt-9 flex items-baseline justify-between">
-          <span className="text-xl font-black">我的備忘</span>
-          <span className="font-display text-base font-bold tracking-[1px] text-muted">NOTES</span>
-        </label>
-        <textarea
-          id="memo"
-          rows={4}
-          value={entry.note}
-          onChange={(event) => updateEntry(race.id, { note: event.target.value })}
-          placeholder="幾點出門、怎麼去、跟誰約"
-          className={textAreaClass}
-        />
+        {canEdit ? (
+          <>
+            <label htmlFor="memo" className="mb-2.5 mt-9 flex items-baseline justify-between">
+              <span className="text-xl font-black">我的備忘</span>
+              <span className="font-display text-base font-bold tracking-[1px] text-muted">NOTES</span>
+            </label>
+            <textarea
+              id="memo"
+              rows={4}
+              value={entry.note}
+              onChange={(event) => updateEntry(race.id, { note: event.target.value })}
+              placeholder="幾點出門、怎麼去、跟誰約"
+              className={textAreaClass}
+            />
+          </>
+        ) : entry.note ? (
+          <section aria-label="備忘" className="mt-9">
+            <SectionTitle title="備忘" tag="NOTES" />
+            <p className="mt-2 whitespace-pre-line rounded-[14px] bg-soft p-3.5 text-[15px] leading-normal">{entry.note}</p>
+          </section>
+        ) : null}
 
         {timing !== "upcoming" ? (
           <a
             href={href.record(race.id)}
             className="focus-ring mt-8 flex min-h-[52px] items-center justify-between rounded-full bg-ink px-5 text-base font-bold text-white"
           >
-            填寫完賽紀錄
+            {canEdit ? "填寫完賽紀錄" : "查看完賽紀錄"}
             <ArrowRight className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
           </a>
         ) : null}

@@ -16,15 +16,15 @@ export default function App() {
 }
 
 function Screens() {
-  const { mode, session, authReady, status, error, races } = useStore();
+  const { authReady, canEdit, status, error, races } = useStore();
   const route = useRoute();
 
   if (!authReady) return <Loading />;
-  if (mode === "cloud" && !session) return <SignIn />;
+  if (route.name === "login") return <SignIn />;
   if (status === "loading") return <Loading />;
   if (status === "error") return <Message title="無法連到後台" body={error ?? "請稍後再試。"} />;
 
-  if (route.name === "new") return <RaceEditor />;
+  if (route.name === "new") return canEdit ? <RaceEditor /> : <SignIn asGate />;
   if (route.name === "list") return <RaceList />;
 
   const race = races.find((item) => item.id === route.id);
@@ -34,7 +34,7 @@ function Screens() {
     case "record":
       return <RaceRecord key={race.id} race={race} />;
     case "edit":
-      return <RaceEditor key={race.id} race={race} />;
+      return canEdit ? <RaceEditor key={race.id} race={race} /> : <SignIn asGate />;
     case "race":
     default:
       return <RaceMemo key={race.id} race={race} />;

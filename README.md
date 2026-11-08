@@ -8,7 +8,7 @@
 - 賽事備忘：報到方式、地點導航、注意事項、賽前清單、我的備忘
 - 完賽紀錄：完賽時間、完賽／未完賽／沒出賽、心得
 - 新增、編輯、刪除賽事
-- 後台同步：Supabase 帳號登入，兩人共用同一份資料，一邊修改另一邊即時更新
+- 後台同步：任何人打開網址都能直接瀏覽；登入後才能編輯，修改會即時同步到其他裝置
 
 沒有設定 Supabase 時會以「本機模式」執行，資料只存在這台裝置的瀏覽器。
 
@@ -28,7 +28,7 @@ npm run dev
 5. 複製 `.env.example` 為 `.env.local`，填入 Project Settings → API 的 Project URL 與 anon public key。
 6. `npm run dev`，登入後第一次載入時，會自動把 `src/data/races.ts` 的內建賽事匯入後台。
 
-anon key 是公開金鑰，資料安全由資料表的 Row Level Security 保護：只有登入的帳號能讀寫。
+anon key 是公開金鑰，資料安全由資料表的 Row Level Security 保護：任何人都能讀取（網站公開瀏覽），只有登入的帳號能新增、修改、刪除。
 
 ## 建置
 

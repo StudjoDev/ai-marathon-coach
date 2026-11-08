@@ -1,4 +1,4 @@
-import { ArrowRight, Plus } from "lucide-react";
+import { ArrowRight, LogIn, Plus } from "lucide-react";
 import { useStore } from "../data/store";
 import { href } from "../router";
 import type { Race } from "../types";
@@ -19,7 +19,7 @@ import { BigDistance, Eyebrow, Hero, Page, SectionTitle, StatRow } from "./ui";
 import { SyncFooter } from "./SyncFooter";
 
 export function RaceList() {
-  const { races, getEntry } = useStore();
+  const { races, getEntry, canEdit } = useStore();
   const today = todayInputValue();
   const { current, past } = splitRaces(races, today);
   const [featured, ...upcoming] = current;
@@ -31,13 +31,23 @@ export function RaceList() {
       <Hero labelledBy="hero-name">
         <div className="flex min-h-11 items-center justify-between">
           <span className="font-display text-xl font-extrabold tracking-[2px]">RACES</span>
-          <a
-            href={href.new()}
-            className="focus-ring flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-white"
-          >
-            <Plus className="h-4 w-4" aria-hidden="true" />
-            新增賽事
-          </a>
+          {canEdit ? (
+            <a
+              href={href.new()}
+              className="focus-ring flex min-h-11 items-center gap-1 rounded-full px-3 text-sm font-bold text-white"
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              新增賽事
+            </a>
+          ) : (
+            <a
+              href={href.login()}
+              className="focus-ring flex min-h-11 items-center gap-1.5 rounded-full px-3 text-sm font-bold text-white"
+            >
+              <LogIn className="h-4 w-4" aria-hidden="true" />
+              登入編輯
+            </a>
+          )}
         </div>
 
         {featured ? <FeaturedRace race={featured} today={today} /> : <EmptyHero />}
@@ -112,7 +122,7 @@ function EmptyHero() {
       <h1 id="hero-name" className="mt-2 text-[34px] font-black leading-tight">
         還沒有下一場
       </h1>
-      <p className="mt-2 text-sm text-muted-dark">報名新賽事後，點右上角新增。</p>
+      <p className="mt-2 text-sm text-muted-dark">報名新賽事後，登入並點右上角新增。</p>
     </div>
   );
 }
@@ -152,7 +162,7 @@ function UpcomingRow({ race, today, backToBack }: { race: Race; today: string; b
 }
 
 function PastRow({ race }: { race: Race }) {
-  const { getEntry } = useStore();
+  const { getEntry, canEdit } = useStore();
   const entry = getEntry(race.id);
   const resultLabel =
     entry.result === "dns" ? "沒出賽" : entry.result === "dnf" ? "未完賽" : entry.finishTime || undefined;
@@ -166,8 +176,10 @@ function PastRow({ race }: { race: Race }) {
       </span>
       {resultLabel ? (
         <span className="font-display text-xl font-bold tabular-nums">{resultLabel}</span>
-      ) : (
+      ) : canEdit ? (
         <span className="text-sm font-bold text-accent-ink">填成績</span>
+      ) : (
+        <span aria-hidden="true" className="font-display text-xl font-bold text-muted">—</span>
       )}
     </a>
   );

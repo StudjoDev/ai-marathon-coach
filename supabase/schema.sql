@@ -53,20 +53,30 @@ drop trigger if exists race_entries_touch on public.race_entries;
 create trigger race_entries_touch before update on public.race_entries
   for each row execute function public.touch_updated();
 
--- 權限：只有登入的帳號能讀寫。請在 Authentication 設定關閉公開註冊，只建立你們兩人的帳號。
-grant usage on schema public to authenticated;
-grant select, insert, update, delete on public.races, public.race_entries to authenticated;
+-- 權限：任何人都能瀏覽；只有登入的帳號能新增、修改、刪除。
+-- 請在 Authentication 設定關閉公開註冊，只建立你們自己的帳號。
+grant usage on schema public to anon, authenticated;
 revoke all on public.races, public.race_entries from anon;
+grant select on public.races, public.race_entries to anon;
+grant select, insert, update, delete on public.races, public.race_entries to authenticated;
 
 alter table public.races enable row level security;
 alter table public.race_entries enable row level security;
 
 drop policy if exists "signed-in users manage races" on public.races;
-create policy "signed-in users manage races" on public.races
+drop policy if exists "anyone can read races" on public.races;
+create policy "anyone can read races" on public.races
+  for select to anon, authenticated using (true);
+drop policy if exists "signed-in users write races" on public.races;
+create policy "signed-in users write races" on public.races
   for all to authenticated using (true) with check (true);
 
 drop policy if exists "signed-in users manage entries" on public.race_entries;
-create policy "signed-in users manage entries" on public.race_entries
+drop policy if exists "anyone can read entries" on public.race_entries;
+create policy "anyone can read entries" on public.race_entries
+  for select to anon, authenticated using (true);
+drop policy if exists "signed-in users write entries" on public.race_entries;
+create policy "signed-in users write entries" on public.race_entries
   for all to authenticated using (true) with check (true);
 
 -- 即時同步：一支手機改了，另一支馬上更新

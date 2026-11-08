@@ -1,5 +1,6 @@
 import { useStore } from "../data/store";
 import { appMeta } from "../data/appMeta";
+import { href } from "../router";
 import { cn } from "./ui";
 
 const syncLabels = {
@@ -13,7 +14,14 @@ export function SyncFooter() {
 
   return (
     <footer className="border-t border-line px-5 pb-[calc(env(safe-area-inset-bottom)+28px)] pt-5 text-[13px] text-muted">
-      {mode === "cloud" ? (
+      {mode === "cloud" && !session ? (
+        <div className="flex items-center justify-between gap-3">
+          <p>訪客瀏覽中，登入後可以編輯。</p>
+          <a href={href.login()} className="focus-ring flex min-h-11 shrink-0 items-center rounded-md px-1 font-bold text-ink">
+            登入
+          </a>
+        </div>
+      ) : mode === "cloud" ? (
         <div className="flex items-center justify-between gap-3">
           <p className="flex min-w-0 items-center gap-2">
             <span

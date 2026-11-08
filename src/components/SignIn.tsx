@@ -1,26 +1,48 @@
 import { useState, type FormEvent } from "react";
+import { ChevronLeft } from "lucide-react";
 import { useStore } from "../data/store";
+import { href, navigate } from "../router";
 import { PrimaryButton } from "./ui";
 
-export function SignIn() {
+/** 登入頁。asGate 為 true 時是直接擋在編輯頁前面，登入後原頁面會自動顯示 */
+export function SignIn({ asGate = false }: { asGate?: boolean }) {
   const { signIn } = useStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string>();
   const [busy, setBusy] = useState(false);
 
+  function goBack() {
+    if (window.history.length > 1) {
+      window.history.back();
+    } else {
+      navigate(href.list(), { replace: true });
+    }
+  }
+
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
     setBusy(true);
-    setError(await signIn(email.trim(), password));
+    const signInError = await signIn(email.trim(), password);
     setBusy(false);
+    setError(signInError);
+    if (!signInError && !asGate) goBack();
   }
 
   return (
-    <main className="mx-auto flex min-h-svh w-full max-w-[480px] flex-col bg-ink px-5 pb-[calc(env(safe-area-inset-bottom)+32px)] pt-[calc(env(safe-area-inset-top)+64px)] text-white">
-      <p className="font-display text-xl font-extrabold tracking-[2px]">RACES</p>
-      <h1 className="mt-16 text-[34px] font-black leading-tight">賽事備忘</h1>
-      <p className="mt-2 text-[15px] text-muted-dark">登入後，兩支手機的賽事與備忘會同步。</p>
+    <main className="mx-auto flex min-h-svh w-full max-w-[480px] flex-col bg-ink px-5 pb-[calc(env(safe-area-inset-bottom)+32px)] pt-[calc(env(safe-area-inset-top)+20px)] text-white">
+      <button
+        type="button"
+        onClick={goBack}
+        className="focus-ring -ml-1.5 flex min-h-11 items-center gap-0.5 self-start rounded-md pr-2 text-base text-white"
+      >
+        <ChevronLeft className="h-[22px] w-[22px]" aria-hidden="true" />
+        先不登入
+      </button>
+
+      <p className="mt-10 font-display text-xl font-extrabold tracking-[2px]">RACES</p>
+      <h1 className="mt-6 text-[34px] font-black leading-tight">登入以編輯</h1>
+      <p className="mt-2 text-[15px] text-muted-dark">不用登入也能瀏覽。登入後可以新增賽事、改備忘、勾清單、填成績。</p>
 
       <form onSubmit={handleSubmit} className="mt-10 flex flex-col gap-4">
         <label className="block">

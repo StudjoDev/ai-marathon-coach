@@ -44,6 +44,8 @@ type Store = {
   error?: string;
   session: Session | null;
   authReady: boolean;
+  /** 本機模式或已登入才能編輯；未登入的訪客只能瀏覽 */
+  canEdit: boolean;
   races: Race[];
   entries: Record<string, RaceEntry>;
   getEntry: (raceId: string) => RaceEntry;
@@ -176,7 +178,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     return () => data.subscription.unsubscribe();
   }, []);
 
-  const loadCloud = useCallback(async () => {
+  const loadCloud = useCallback(async (signedIn: boolean) => {
     if (!supabase) return;
     const [raceResult, entryResult] = await Promise.all([
       supabase.from("races").select("*").order("date"),
@@ -190,8 +192,8 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     }
 
     let raceRows = raceResult.data as RaceRow[];
-    if (raceRows.length === 0) {
-      // 第一次使用：把內建賽事匯入後台
+    if (raceRows.length === 0 && signedIn) {
+      // 第一次登入使用：把內建賽事匯入後台
       const seeded = await supabase
         .from("races")
         .upsert(seedRaces.map(toRaceRow), { onConflict: "id", ignoreDuplicates: true })
@@ -214,9 +216,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   // 載入資料、訂閱即時更新、回到 App 時重新整理
   useEffect(() => {
-    if (!supabase || !session) return;
+    if (!supabase || !authReady) return;
     const client = supabase;
-    loadCloud();
+    const signedIn = Boolean(session);
+    loadCloud(signedIn);
 
     const channel = client
       .channel("race-memo")
@@ -248,7 +251,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       .subscribe();
 
     const onVisible = () => {
-      if (document.visibilityState === "visible") loadCloud();
+      if (document.visibilityState === "visible") loadCloud(signedIn);
     };
     document.addEventListener("visibilitychange", onVisible);
 
@@ -256,7 +259,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       document.removeEventListener("visibilitychange", onVisible);
       client.removeChannel(channel);
     };
-  }, [session, userId, loadCloud]);
+  }, [authReady, session, userId, loadCloud]);
 
   // 本機模式寫回 localStorage
   useEffect(() => {
@@ -266,6 +269,10 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (mode === "local") writeLocal(LOCAL_ENTRIES, entries);
   }, [mode, entries]);
+
+  const canEdit = mode === "local" || Boolean(session);
+  const canEditRef = useRef(canEdit);
+  canEditRef.current = canEdit;
 
   const getEntry = useCallback((raceId: string) => entries[raceId] ?? emptyEntry(raceId), [entries]);
 
@@ -280,6 +287,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const updateEntry = useCallback<Store["updateEntry"]>(
     (raceId, patch) => {
+      if (!canEditRef.current) return;
       setEntries((map) => {
         const next = { ...(map[raceId] ?? emptyEntry(raceId)), ...patch, raceId };
         const updated = { ...map, [raceId]: next };
@@ -332,9 +340,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     await supabase?.auth.signOut();
-    setRaces([]);
-    setEntries({});
-    setStatus("loading");
+    setSync("synced");
   }, []);
 
   const value = useMemo<Store>(
@@ -345,6 +351,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       error,
       session,
       authReady,
+      canEdit,
       races,
       entries,
       getEntry,
@@ -354,7 +361,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       signIn,
       signOut
     }),
-    [mode, status, sync, error, session, authReady, races, entries, getEntry, updateEntry, saveRace, deleteRace, signIn, signOut]
+    [mode, status, sync, error, session, authReady, canEdit, races, entries, getEntry, updateEntry, saveRace, deleteRace, signIn, signOut]
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;
