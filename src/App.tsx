@@ -6,7 +6,7 @@ import { PhotoGallery } from "./components/PhotoGallery";
 import { SignIn } from "./components/SignIn";
 import { href } from "./router";
 import { StoreProvider, useStore } from "./data/store";
-import { useRoute } from "./router";
+import { useRoute, useScrollRestoration } from "./router";
 
 export default function App() {
   return (
@@ -19,6 +19,7 @@ export default function App() {
 function Screens() {
   const { authReady, canEdit, status, error, races } = useStore();
   const route = useRoute();
+  useScrollRestoration(route);
 
   if (!authReady) return <Loading />;
   if (route.name === "login") return <SignIn />;
