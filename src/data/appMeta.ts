@@ -1,4 +1,4 @@
 export const appMeta = {
-  version: "v2026.07.09.3",
-  releaseNote: "行程表賽事週強化：突出賽事名稱、日期、距離與時間"
+  version: "v2026.11.08.1",
+  releaseNote: "改版為賽事備忘：運動風格介面、完賽紀錄、Supabase 雲端同步"
 };

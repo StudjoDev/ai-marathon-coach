@@ -1,135 +1,115 @@
-import type { Race, RaceCategory, RaceEventMode, RaceRegistrationStatus, RaceSourceStatus } from "../types";
+import type { Race } from "../types";
 import { toDateOnly } from "./dateUtils";
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
+const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
-export function getUpcomingRaces(raceList: Race[], today: string | Date = new Date()) {
-  const todayDate = toDateOnly(today);
+export type RaceTiming = "past" | "today" | "upcoming";
 
-  return [...raceList]
-    .filter((race) => toDateOnly(race.endDate ?? race.date).getTime() >= todayDate.getTime())
-    .sort((a, b) => a.date.localeCompare(b.date));
+export function sortByDate(raceList: Race[]) {
+  return [...raceList].sort((a, b) => a.date.localeCompare(b.date));
 }
 
-export function getNextRace(raceList: Race[], today: string | Date = new Date()) {
-  return getUpcomingRaces(raceList, today)[0];
+export function getDaysUntil(date: string, today: string) {
+  return Math.round((toDateOnly(date).getTime() - toDateOnly(today).getTime()) / ONE_DAY_MS);
 }
 
-export function getDaysUntilRace(date: string, today: string | Date = new Date()) {
-  const raceDate = toDateOnly(date);
-  const todayDate = toDateOnly(today);
-  return Math.ceil((raceDate.getTime() - todayDate.getTime()) / ONE_DAY_MS);
+export function getRaceTiming(race: Race, today: string): RaceTiming {
+  if (getDaysUntil(race.endDate ?? race.date, today) < 0) return "past";
+  if (getDaysUntil(race.date, today) <= 0) return "today";
+  return "upcoming";
 }
 
-export function getRacePriorityLabel(category: RaceCategory) {
-  const labels: Record<RaceCategory, string> = {
-    A: "A 賽｜年度目標",
-    B: "B 賽｜訓練檢核賽",
-    C: "C 賽｜恢復/輔助賽"
+export function splitRaces(raceList: Race[], today: string) {
+  const sorted = sortByDate(raceList);
+  return {
+    current: sorted.filter((race) => getRaceTiming(race, today) !== "past"),
+    past: sorted.filter((race) => getRaceTiming(race, today) === "past").reverse()
   };
-
-  return labels[category];
 }
 
-export function getRaceCategoryStyle(category: RaceCategory) {
-  const styles: Record<RaceCategory, string> = {
-    A: "bg-primary text-white border-primary",
-    B: "bg-success/10 text-success border-success/30",
-    C: "bg-race-c-soft text-race-c border-race-c-line"
-  };
-
-  return styles[category];
+/** 與前一場或下一場相隔一天 */
+export function isBackToBack(race: Race, raceList: Race[]) {
+  return raceList.some((other) => other.id !== race.id && Math.abs(getDaysUntil(other.date, race.date)) === 1);
 }
 
-export function getRaceRegistrationLabel(status: RaceRegistrationStatus) {
-  const labels: Record<RaceRegistrationStatus, string> = {
-    registered: "已報名",
-    not_registered: "未報名",
-    waitlist: "候補中",
-    unknown: "狀態待確認"
-  };
-
-  return labels[status];
+export function formatHeroDistance(distanceKm: number) {
+  if (distanceKm > 20 && distanceKm < 22) return "21.1";
+  return Number.isInteger(distanceKm) ? String(distanceKm) : distanceKm.toFixed(1);
 }
 
-export function getRaceSourceStatusLabel(status: RaceSourceStatus) {
-  const labels: Record<RaceSourceStatus, string> = {
-    official_confirmed: "官方已確認",
-    official_confirmed_with_warning: "官方已確認，需賽前複查",
-    official_link_blocked_backup_confirmed: "官方連結需驗證，備用資料已確認",
-    official_pdf_link_confirmed_manual_review_needed: "官方 PDF 需人工覆核"
-  };
-
-  return labels[status];
+export function formatDistance(distanceKm: number) {
+  return `${formatHeroDistance(distanceKm)}K`;
 }
 
-export function formatRaceDate(date: string) {
-  return date.replace(/-/g, "/");
+export function monthLabel(date: string) {
+  return MONTHS[toDateOnly(date).getMonth()];
 }
 
-export function formatRaceDateRange(race: Race) {
-  if (!race.endDate || race.endDate === race.date) {
-    return `${formatRaceDate(race.date)} ${race.dayOfWeek}`;
+export function dayLabel(date: string) {
+  return String(toDateOnly(date).getDate());
+}
+
+export function weekdayLabel(date: string) {
+  return WEEKDAYS[toDateOnly(date).getDay()];
+}
+
+export function dotDate(date: string) {
+  const value = toDateOnly(date);
+  return `${String(value.getMonth() + 1).padStart(2, "0")}.${String(value.getDate()).padStart(2, "0")}`;
+}
+
+export function getStartShort(race: Race) {
+  if (race.eventMode === "virtual") return undefined;
+  return race.startTime.match(/\d{2}:\d{2}/)?.[0];
+}
+
+export function getLimitShort(race: Race) {
+  const limit = race.finishLimit.replace(/（.*?）|\(.*?\)/g, "").trim();
+  if (!limit || /未確認|待公告/.test(limit)) return undefined;
+  if (race.eventMode === "virtual") return limit.replace(/內.*$/, "");
+
+  return limit
+    .replace(/\s*小時\s*/, "H")
+    .replace(/\s*分鐘/, "MIN")
+    .replace(/\s*分$/, "")
+    .replace(/\s+/g, "");
+}
+
+export type KeyStat = { label: string; value: string };
+
+export function getKeyStats(race: Race): KeyStat[] {
+  if (race.eventMode === "virtual") {
+    const stats: KeyStat[] = [{ label: "期間", value: `${dotDate(race.date)}–${dotDate(race.endDate ?? race.date)}` }];
+    const limit = getLimitShort(race);
+    if (limit) stats.push({ label: "限時", value: limit });
+    return stats;
   }
 
-  return `${formatRaceDate(race.date)}-${formatRaceDate(race.endDate)}`;
+  const stats: KeyStat[] = [];
+  const start = getStartShort(race);
+  const limit = getLimitShort(race);
+  if (start) stats.push({ label: "起跑", value: start });
+  if (race.assemblyShort) stats.push({ label: "集合", value: race.assemblyShort });
+  if (limit) stats.push({ label: "限時", value: limit });
+  return stats;
 }
 
-export function formatRaceDistance(distanceKm: number) {
-  if (distanceKm > 20 && distanceKm < 22) {
-    return "21K";
-  }
-
-  return `${Number.isInteger(distanceKm) ? distanceKm.toFixed(0) : distanceKm.toFixed(1)}K`;
+export function getRaceSubtitle(race: Race) {
+  const start = getStartShort(race);
+  if (race.eventMode === "virtual") return `${formatDistance(race.distanceKm)} 線上累積`;
+  return start ? `${formatDistance(race.distanceKm)} · ${start} 起跑` : formatDistance(race.distanceKm);
 }
 
-export function getRaceModeLabel(mode: RaceEventMode = "in_person") {
-  const labels: Record<RaceEventMode, string> = {
-    in_person: "實體",
-    virtual: "線上"
-  };
-
-  return labels[mode];
+export function getMapUrl(race: Race) {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(race.venue)}`;
 }
 
-export function getRaceOfficialLinkLabel(race: Race) {
-  if (race.sourceStatus === "official_pdf_link_confirmed_manual_review_needed") {
-    return "官方 PDF";
+export function getChecklistItems(race: Race) {
+  if (race.eventMode === "virtual") {
+    return ["App 已登入並看得到活動", "手錶已連動", "活動期間內完成累積"];
   }
 
-  if (race.officialUrl.includes("signup") || race.officialUrl.includes("bao-ming")) {
-    return "官方報名頁";
-  }
-
-  return "官方網站";
-}
-
-export function getRacePrimaryWarning(race: Race) {
-  if (race.id === "mt-fuji-tatta-run-2026-summer-half") {
-    return race.warnings.find((warning) => warning.includes("累積")) ?? race.warnings[0];
-  }
-
-  if (race.id === "marie-claire-pink-run-2026-10k") {
-    return race.warnings.find((warning) => warning.includes("板橋半馬")) ?? race.warnings[0];
-  }
-
-  if (race.id === "taoyuan-bald-cypress-2026-11k") {
-    return race.warnings.find((warning) => warning.includes("14 天")) ?? race.warnings[0];
-  }
-
-  if (race.id === "tigerrun-2026-10k" || race.id === "sportaiwan-thanksgiving-2026-10k") {
-    return race.warnings.find((warning) => warning.includes("連賽") || warning.includes("不可硬拚")) ?? race.warnings[0];
-  }
-
-  return race.warnings[0];
-}
-
-export function getRaceCategoryCounts(raceList: Race[]) {
-  return raceList.reduce<Record<RaceCategory, number>>(
-    (counts, race) => ({
-      ...counts,
-      [race.category]: counts[race.category] + 1
-    }),
-    { A: 0, B: 0, C: 0 }
-  );
+  return ["收到物資並核對", "號碼布、晶片", "跑鞋、衣物", "手錶充電", "確認交通方式"];
 }

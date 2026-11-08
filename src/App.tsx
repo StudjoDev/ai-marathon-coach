@@ -1,47 +1,64 @@
-import { useMemo, useState } from "react";
-import { CalendarDays, Flag, type LucideIcon } from "lucide-react";
-import { BottomNav } from "./components/BottomNav";
-import { RaceSchedule } from "./components/RaceSchedule";
-import { WeeklyPlanView } from "./components/WeeklyPlanView";
-import { appMeta } from "./data/appMeta";
-
-export type AppTab = "races" | "schedule";
-
-const tabs = [
-  { id: "races", label: "賽事", icon: Flag },
-  { id: "schedule", label: "行程表", icon: CalendarDays }
-] satisfies Array<{ id: AppTab; label: string; icon: LucideIcon }>;
+import { RaceEditor } from "./components/RaceEditor";
+import { RaceList } from "./components/RaceList";
+import { RaceMemo } from "./components/RaceMemo";
+import { RaceRecord } from "./components/RaceRecord";
+import { SignIn } from "./components/SignIn";
+import { href } from "./router";
+import { StoreProvider, useStore } from "./data/store";
+import { useRoute } from "./router";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<AppTab>("races");
-
-  const activeScreen = useMemo(() => {
-    switch (activeTab) {
-      case "schedule":
-        return <WeeklyPlanView />;
-      case "races":
-      default:
-        return <RaceSchedule />;
-    }
-  }, [activeTab]);
-
   return (
-    <div className="min-h-svh bg-background text-ink">
-      <main className="mx-auto min-h-svh w-full max-w-[430px] px-5 pb-[calc(104px+env(safe-area-inset-bottom))] pt-5">
-        <div className="mb-3 flex justify-end">
-          <span
-            className="rounded-full border border-line bg-surface px-2.5 py-1 text-[11px] font-bold text-muted shadow-card"
-            title={appMeta.releaseNote}
-            aria-label={`目前版本 ${appMeta.version}，${appMeta.releaseNote}`}
-          >
-            版本 {appMeta.version}
-          </span>
-        </div>
-        <div key={activeTab} className="enter-up">
-          {activeScreen}
-        </div>
-      </main>
-      <BottomNav tabs={tabs} activeTab={activeTab} onChange={setActiveTab} />
-    </div>
+    <StoreProvider>
+      <Screens />
+    </StoreProvider>
+  );
+}
+
+function Screens() {
+  const { mode, session, authReady, status, error, races } = useStore();
+  const route = useRoute();
+
+  if (!authReady) return <Loading />;
+  if (mode === "cloud" && !session) return <SignIn />;
+  if (status === "loading") return <Loading />;
+  if (status === "error") return <Message title="無法連到後台" body={error ?? "請稍後再試。"} />;
+
+  if (route.name === "new") return <RaceEditor />;
+  if (route.name === "list") return <RaceList />;
+
+  const race = races.find((item) => item.id === route.id);
+  if (!race) return <Message title="找不到這場賽事" body="可能已被刪除。" />;
+
+  switch (route.name) {
+    case "record":
+      return <RaceRecord key={race.id} race={race} />;
+    case "edit":
+      return <RaceEditor key={race.id} race={race} />;
+    case "race":
+    default:
+      return <RaceMemo key={race.id} race={race} />;
+  }
+}
+
+function Loading() {
+  return (
+    <main className="flex min-h-svh items-center justify-center bg-ink">
+      <p className="font-display text-xl font-extrabold tracking-[2px] text-muted-dark" role="status">
+        LOADING…
+      </p>
+    </main>
+  );
+}
+
+function Message({ title, body }: { title: string; body: string }) {
+  return (
+    <main className="mx-auto flex min-h-svh max-w-[480px] flex-col justify-center bg-paper px-5">
+      <h1 className="text-[28px] font-black">{title}</h1>
+      <p className="mt-2 text-[15px] text-muted">{body}</p>
+      <a href={href.list()} className="focus-ring mt-6 self-start rounded text-[15px] font-bold text-accent-ink">
+        回賽事列表
+      </a>
+    </main>
   );
 }
