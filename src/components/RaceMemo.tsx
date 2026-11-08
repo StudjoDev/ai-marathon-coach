@@ -1,5 +1,6 @@
 import { ArrowRight, ArrowUpRight, LogIn, Pencil } from "lucide-react";
 import { useStore } from "../data/store";
+import { hasPhotos } from "../data/photos";
 import { href } from "../router";
 import type { Race } from "../types";
 import { todayInputValue } from "../utils/dateUtils";
@@ -155,7 +156,7 @@ export function RaceMemo({ race }: { race: Race }) {
             href={href.record(race.id)}
             className="focus-ring mt-8 flex min-h-[52px] items-center justify-between rounded-full bg-ink px-5 text-base font-bold text-white"
           >
-            {canEdit ? "填寫完賽紀錄" : "查看完賽紀錄"}
+            {hasPhotos(race.id) ? "完賽紀錄與照片" : canEdit ? "填寫完賽紀錄" : "查看完賽紀錄"}
             <ArrowRight className="h-5 w-5" strokeWidth={2.4} aria-hidden="true" />
           </a>
         ) : null}

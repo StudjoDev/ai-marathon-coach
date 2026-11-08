@@ -2,6 +2,7 @@ import { RaceEditor } from "./components/RaceEditor";
 import { RaceList } from "./components/RaceList";
 import { RaceMemo } from "./components/RaceMemo";
 import { RaceRecord } from "./components/RaceRecord";
+import { PhotoGallery } from "./components/PhotoGallery";
 import { SignIn } from "./components/SignIn";
 import { href } from "./router";
 import { StoreProvider, useStore } from "./data/store";
@@ -33,6 +34,8 @@ function Screens() {
   switch (route.name) {
     case "record":
       return <RaceRecord key={race.id} race={race} />;
+    case "photos":
+      return <PhotoGallery key={race.id} race={race} initialPhoto={route.photo} />;
     case "edit":
       return canEdit ? <RaceEditor key={race.id} race={race} /> : <SignIn asGate />;
     case "race":

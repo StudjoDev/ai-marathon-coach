@@ -3,6 +3,7 @@ import { href } from "../router";
 import type { Race, RaceResult } from "../types";
 import { dayLabel, formatHeroDistance, monthLabel } from "../utils/raceUtils";
 import { BigDistance, Eyebrow, Hero, Page, TopBar, cn, textAreaClass } from "./ui";
+import { PhotoPreview } from "./PhotoPreview";
 
 const results: Array<{ value: RaceResult; label: string }> = [
   { value: "finished", label: "完賽" },
@@ -30,8 +31,10 @@ export function RaceRecord({ race }: { race: Race }) {
         <p className="mt-3 text-[13px] text-muted-dark">{race.venue}</p>
       </Hero>
 
-      {canEdit ? null : <ReadOnlyRecord race={race} />}
-      <div className={cn("flex flex-col px-5 pb-[calc(env(safe-area-inset-bottom)+40px)] pt-7", !canEdit && "hidden")}>
+      {!canEdit ? (
+        <ReadOnlyRecord race={race} />
+      ) : (
+      <div className="flex flex-col px-5 pb-[calc(env(safe-area-inset-bottom)+40px)] pt-7">
         <label htmlFor="finish" className="flex items-baseline justify-between">
           <span className="text-xl font-black">完賽時間</span>
           <span className="font-display text-base font-bold tracking-[1px] text-muted">FINISH TIME</span>
@@ -76,7 +79,9 @@ export function RaceRecord({ race }: { race: Race }) {
           </div>
         </fieldset>
 
-        <label htmlFor="reflection" className="mb-2.5 mt-8 flex items-baseline justify-between">
+        <PhotoPreview raceId={race.id} />
+
+        <label htmlFor="reflection" className="mb-2.5 mt-9 flex items-baseline justify-between">
           <span className="text-xl font-black">心得</span>
           <span className="font-display text-base font-bold tracking-[1px] text-muted">NOTES</span>
         </label>
@@ -100,6 +105,7 @@ export function RaceRecord({ race }: { race: Race }) {
           查看賽事備忘
         </a>
       </div>
+      )}
     </Page>
   );
 }
@@ -121,16 +127,19 @@ function ReadOnlyRecord({ race }: { race: Race }) {
           <p className="mt-1.5 border-b-2 border-ink pb-2 font-display text-[64px] font-extrabold italic tabular-nums tracking-[-1px]">
             {entry.result === "finished" ? entry.finishTime || "—" : resultLabel}
           </p>
-          {entry.reflection ? (
-            <section aria-label="心得" className="mt-8">
-              <p className="mb-2.5 text-xl font-black">心得</p>
-              <p className="whitespace-pre-line rounded-[14px] bg-soft p-3.5 text-[15px] leading-normal">{entry.reflection}</p>
-            </section>
-          ) : null}
         </>
       ) : (
         <p className="text-[15px] text-muted">還沒有填寫完賽紀錄。</p>
       )}
+
+      <PhotoPreview raceId={race.id} />
+
+      {entry.reflection ? (
+        <section aria-label="心得" className="mt-9">
+          <p className="mb-2.5 text-xl font-black">心得</p>
+          <p className="whitespace-pre-line rounded-[14px] bg-soft p-3.5 text-[15px] leading-normal">{entry.reflection}</p>
+        </section>
+      ) : null}
 
       <a
         href={href.race(race.id)}

@@ -5,17 +5,19 @@ export type Route =
   | { name: "race"; id: string }
   | { name: "record"; id: string }
   | { name: "edit"; id: string }
+  | { name: "photos"; id: string; photo?: string }
   | { name: "new" }
   | { name: "login" };
 
 export function parseRoute(hash: string): Route {
-  const [, page, id, action] = hash.replace(/^#/, "").split("/");
+  const [, page, id, action, extra] = hash.replace(/^#/, "").split("/");
   if (page === "new") return { name: "new" };
   if (page === "login") return { name: "login" };
   if (page === "race" && id) {
     const raceId = decodeURIComponent(id);
     if (action === "record") return { name: "record", id: raceId };
     if (action === "edit") return { name: "edit", id: raceId };
+    if (action === "photos") return { name: "photos", id: raceId, photo: extra ? decodeURIComponent(extra) : undefined };
     return { name: "race", id: raceId };
   }
   return { name: "list" };
@@ -26,6 +28,8 @@ export const href = {
   race: (id: string) => `#/race/${encodeURIComponent(id)}`,
   record: (id: string) => `#/race/${encodeURIComponent(id)}/record`,
   edit: (id: string) => `#/race/${encodeURIComponent(id)}/edit`,
+  photos: (id: string, photo?: string) =>
+    `#/race/${encodeURIComponent(id)}/photos${photo ? `/${encodeURIComponent(photo)}` : ""}`,
   new: () => "#/new",
   login: () => "#/login"
 };
