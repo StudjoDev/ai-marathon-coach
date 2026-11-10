@@ -34,7 +34,7 @@ textarea {
   }
 
   .row-link {
-    @apply focus-ring grid min-h-[76px] grid-cols-[64px_minmax(0,1fr)_auto] items-center gap-3 border-b border-line text-ink no-underline transition-colors active:bg-soft;
+    @apply focus-ring grid min-h-[76px] grid-cols-[76px_minmax(0,1fr)_auto] items-center gap-3 border-b border-line text-ink no-underline transition-colors active:bg-soft;
   }
 }
 

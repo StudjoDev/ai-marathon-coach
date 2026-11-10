@@ -2,8 +2,7 @@ import type { Race } from "../types";
 import { toDateOnly } from "./dateUtils";
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
-const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
-const WEEKDAYS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+const WEEKDAYS = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
 
 export type RaceTiming = "past" | "today" | "upcoming";
 
@@ -43,21 +42,14 @@ export function formatDistance(distanceKm: number) {
   return `${formatHeroDistance(distanceKm)}K`;
 }
 
-export function monthLabel(date: string) {
-  return MONTHS[toDateOnly(date).getMonth()];
-}
-
-export function dayLabel(date: string) {
-  return String(toDateOnly(date).getDate());
-}
-
 export function weekdayLabel(date: string) {
   return WEEKDAYS[toDateOnly(date).getDay()];
 }
 
-export function dotDate(date: string) {
+/** 數字日期，例如 11/22 */
+export function slashDate(date: string) {
   const value = toDateOnly(date);
-  return `${String(value.getMonth() + 1).padStart(2, "0")}.${String(value.getDate()).padStart(2, "0")}`;
+  return `${value.getMonth() + 1}/${value.getDate()}`;
 }
 
 export function getStartShort(race: Race) {
@@ -81,7 +73,7 @@ export type KeyStat = { label: string; value: string };
 
 export function getKeyStats(race: Race): KeyStat[] {
   if (race.eventMode === "virtual") {
-    const stats: KeyStat[] = [{ label: "期間", value: `${dotDate(race.date)}–${dotDate(race.endDate ?? race.date)}` }];
+    const stats: KeyStat[] = [{ label: "期間", value: `${slashDate(race.date)}–${slashDate(race.endDate ?? race.date)}` }];
     const limit = getLimitShort(race);
     if (limit) stats.push({ label: "限時", value: limit });
     return stats;

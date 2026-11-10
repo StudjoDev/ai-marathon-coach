@@ -4,15 +4,14 @@ import { href } from "../router";
 import type { Race } from "../types";
 import { todayInputValue } from "../utils/dateUtils";
 import {
-  dayLabel,
-  dotDate,
+  slashDate,
+  weekdayLabel,
   formatHeroDistance,
   getDaysUntil,
   getKeyStats,
   getRaceSubtitle,
   getRaceTiming,
   isBackToBack,
-  monthLabel,
   splitRaces
 } from "../utils/raceUtils";
 import { BigDistance, Eyebrow, Hero, Page, SectionTitle, StatRow } from "./ui";
@@ -143,8 +142,8 @@ function UpcomingRow({ race, today, backToBack }: { race: Race; today: string; b
   return (
     <a href={href.race(race.id)} className="row-link">
       <span className="font-display leading-none">
-        <span className="block text-[13px] font-semibold tracking-[1px] text-muted">{monthLabel(race.date)}</span>
-        <span className="block text-[32px] font-extrabold">{dayLabel(race.date)}</span>
+        <span className="block font-sans text-xs font-semibold text-muted">{weekdayLabel(race.date)}</span>
+        <span className="mt-0.5 block text-2xl font-extrabold tabular-nums">{slashDate(race.date)}</span>
       </span>
       <span className="min-w-0">
         <span className="block truncate text-base font-bold">{race.shortName}</span>
@@ -169,7 +168,7 @@ function PastRow({ race }: { race: Race }) {
 
   return (
     <a href={href.record(race.id)} className="row-link min-h-[68px]">
-      <span className="font-display text-xl font-bold text-muted">{dotDate(race.date)}</span>
+      <span className="font-display text-xl font-bold text-muted">{slashDate(race.date)}</span>
       <span className="min-w-0">
         <span className="block truncate text-[15px] font-medium">{race.shortName}</span>
         <span className="mt-0.5 block text-[13px] text-muted">{getRaceSubtitle(race)}</span>

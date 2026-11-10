@@ -11,8 +11,7 @@ import {
   getKeyStats,
   getMapUrl,
   getRaceTiming,
-  monthLabel,
-  dayLabel,
+  slashDate,
   weekdayLabel
 } from "../utils/raceUtils";
 import { BigDistance, Eyebrow, Hero, Page, SectionTitle, StatRow, TopBar, cn, textAreaClass } from "./ui";
@@ -55,7 +54,7 @@ export function RaceMemo({ race }: { race: Race }) {
         />
         <div className="mt-7">
           <Eyebrow>
-            {monthLabel(race.date)} {dayLabel(race.date)} · {weekdayLabel(race.date)} · {when}
+            {slashDate(race.date)} {weekdayLabel(race.date)} · {when}
           </Eyebrow>
         </div>
         <h1 id="race-name" className="mt-2 text-[28px] font-black leading-snug">

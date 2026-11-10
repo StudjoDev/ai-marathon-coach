@@ -1,7 +1,7 @@
 import { useStore } from "../data/store";
 import { href } from "../router";
 import type { Race, RaceResult } from "../types";
-import { dayLabel, formatHeroDistance, monthLabel } from "../utils/raceUtils";
+import { formatHeroDistance, slashDate, weekdayLabel } from "../utils/raceUtils";
 import { BigDistance, Eyebrow, Hero, Page, TopBar, cn, textAreaClass } from "./ui";
 import { PhotoPreview } from "./PhotoPreview";
 
@@ -21,7 +21,7 @@ export function RaceRecord({ race }: { race: Race }) {
         <TopBar back={{ href: href.list(), label: "賽事" }} />
         <div className="mt-7">
           <Eyebrow>
-            {entry.result === "finished" ? "FINISHED" : "RESULT"} · {monthLabel(race.date)} {dayLabel(race.date)}
+            {entry.result === "finished" ? "FINISHED" : "RESULT"} · {slashDate(race.date)} {weekdayLabel(race.date)}
           </Eyebrow>
         </div>
         <h1 id="race-name" className="mt-2 text-[28px] font-black leading-snug">
