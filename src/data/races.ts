@@ -131,6 +131,24 @@ export const races: Race[] = [
     memo: ["自備大會規格衣保袋，05:20 前完成寄物", "05:50 起跑，起跑後 10 分鐘起點關門", "晶片綁在鞋帶前端"]
   },
   {
+    id: "2027-04-11-2hiyuv",
+    name: "2027 台新 WOMEN RUN 台北",
+    shortName: "WOMEN RUN 10K",
+    date: "2027-04-11",
+    distanceKm: 10,
+    venue: "總統府前凱達格蘭大道（終點大佳河濱公園）",
+    startTime: "05:45",
+    finishLimit: "2 小時（07:45 終點關門）",
+    officialUrl: "https://www.womenruntpe.com/info.php?location=taipei",
+    assemblyShort: "04:45",
+    checkInSummary: "宅配 · 3/25 起陸續寄出",
+    memo: [
+      "起點凱道、終點大佳河濱，不在同一個地方",
+      "宅配物資 3/25 起寄出，當天直接到會場集合、不用報到",
+      "寄物要用大會專屬衣保袋，10K 寄物時段待確認"
+    ]
+  },
+  {
     id: "bali-trail-2027-8k",
     name: "2027 Bali Trail 八里越野",
     shortName: "八里越野 8K",
