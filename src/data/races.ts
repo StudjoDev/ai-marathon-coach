@@ -139,13 +139,14 @@ export const races: Race[] = [
     venue: "臺北市大佳河濱公園巨蛋廣場",
     startTime: "07:45（分兩梯次出發）",
     finishLimit: "2 小時（09:45 終點關門）",
-    officialUrl: "https://www.worldvision.org.tw/articles/302",
+    officialUrl: "https://irunner.biji.co/2027Global",
     assemblyShort: "07:00",
-    checkInSummary: "宅配 · 3/22 前寄達",
+    checkInSummary: "宅配 · 3/8 起寄出，3/22 前收到",
     memo: [
-      "報名的是一般體驗組，07:45 起跑、分兩梯次出發",
-      "07:00–07:30 集結，晶片貼在號碼布背面、不要撕掉",
-      "跑衣、號碼布賽前宅配，3/22 還沒收到要聯絡客服"
+      "一般體驗組 07:45 起跑、分兩梯次，起跑後 10 分鐘就不能出發",
+      "07:00–07:30 集結，晶片貼在號碼布背面",
+      "寄物 06:00 起，憑號碼布、每人一件有封口的袋子",
+      "免費接駁車：捷運行天宮站 2 號出口 05:30–07:15，回程 09:00–10:30"
     ]
   },
   {
