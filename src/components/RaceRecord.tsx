@@ -3,6 +3,7 @@ import { href } from "../router";
 import type { Race, RaceResult } from "../types";
 import { formatHeroDistance, slashDate, weekdayLabel } from "../utils/raceUtils";
 import { BigDistance, Eyebrow, Hero, Page, TopBar, cn, textAreaClass } from "./ui";
+import { CertificateSection } from "./CertificateSection";
 import { PhotoPreview } from "./PhotoPreview";
 
 const results: Array<{ value: RaceResult; label: string }> = [
@@ -79,6 +80,8 @@ export function RaceRecord({ race }: { race: Race }) {
           </div>
         </fieldset>
 
+        <CertificateSection raceId={race.id} />
+
         <PhotoPreview raceId={race.id} />
 
         <label htmlFor="reflection" className="mb-2.5 mt-9 flex items-baseline justify-between">
@@ -131,6 +134,8 @@ function ReadOnlyRecord({ race }: { race: Race }) {
       ) : (
         <p className="text-[15px] text-muted">還沒有填寫完賽紀錄。</p>
       )}
+
+      <CertificateSection raceId={race.id} />
 
       <PhotoPreview raceId={race.id} />
 
