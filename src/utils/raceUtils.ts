@@ -34,7 +34,8 @@ export function isBackToBack(race: Race, raceList: Race[]) {
 }
 
 export function formatHeroDistance(distanceKm: number) {
-  if (distanceKm > 20 && distanceKm < 22) return "21.1";
+  // 標準半馬（填 21、21.1 或 21.0975）統一顯示 21.1；21.5 這類非標準距離照實顯示
+  if (Math.abs(distanceKm - 21.0975) < 0.11) return "21.1";
   return Number.isInteger(distanceKm) ? String(distanceKm) : distanceKm.toFixed(1);
 }
 

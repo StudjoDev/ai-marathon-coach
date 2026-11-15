@@ -160,5 +160,24 @@ export const races: Race[] = [
     officialUrl: "https://venturetreks.asia/balitrailtaiwan/",
     checkInSummary: "待官方公告",
     memo: ["時間表與報到方式待官方公告", "確認強制裝備與交通接駁", "準備越野鞋"]
+  },
+  {
+    id: "2027-05-22-ruadpj",
+    name: "2027 台北星光馬拉松",
+    shortName: "台北星光半馬",
+    date: "2027-05-22",
+    distanceKm: 21.5,
+    venue: "台北市大佳河濱公園",
+    startTime: "17:30",
+    finishLimit: "4 小時（21:30 結束）",
+    officialUrl: "https://bao-ming.com/eb/content/7259#34430",
+    assemblyShort: "17:20",
+    distanceNote: "比標準半馬長一點",
+    checkInSummary: "宅配 · 賽前一週寄出",
+    memo: [
+      "傍晚 17:30 起跑的夜跑，記得戴大會的 LED 手環",
+      "折返點要領信物，沒拿會被取消資格",
+      "寄物 15:30–23:10，用路跑衣保袋並放入衣保卡"
+    ]
   }
 ];
