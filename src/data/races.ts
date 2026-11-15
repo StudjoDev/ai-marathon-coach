@@ -131,6 +131,23 @@ export const races: Race[] = [
     memo: ["自備大會規格衣保袋，05:20 前完成寄物", "05:50 起跑，起跑後 10 分鐘起點關門", "晶片綁在鞋帶前端"]
   },
   {
+    id: "2027-03-27-dmuiki",
+    name: "2027 Global 6K For Water 公益路跑",
+    shortName: "Global 6K",
+    date: "2027-03-27",
+    distanceKm: 6,
+    venue: "臺北市大佳河濱公園巨蛋廣場",
+    startTime: "待公告",
+    finishLimit: "待公告",
+    officialUrl: "https://www.worldvision.org.tw/articles/302",
+    checkInSummary: "宅配 · 3/22 前寄達",
+    memo: [
+      "報名的是一般體驗組，不用扛提水桶",
+      "活動時間 06:00–10:30，起跑與集合時間待官方公告",
+      "跑衣、號碼布賽前宅配，3/22 還沒收到要聯絡客服"
+    ]
+  },
+  {
     id: "2027-04-11-2hiyuv",
     name: "2027 台新 WOMEN RUN 台北",
     shortName: "WOMEN RUN 10K",
