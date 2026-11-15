@@ -137,13 +137,14 @@ export const races: Race[] = [
     date: "2027-03-27",
     distanceKm: 6,
     venue: "臺北市大佳河濱公園巨蛋廣場",
-    startTime: "待公告",
-    finishLimit: "待公告",
+    startTime: "07:45（分兩梯次出發）",
+    finishLimit: "2 小時（09:45 終點關門）",
     officialUrl: "https://www.worldvision.org.tw/articles/302",
+    assemblyShort: "07:00",
     checkInSummary: "宅配 · 3/22 前寄達",
     memo: [
-      "報名的是一般體驗組，不用扛提水桶",
-      "活動時間 06:00–10:30，起跑與集合時間待官方公告",
+      "報名的是一般體驗組，07:45 起跑、分兩梯次出發",
+      "07:00–07:30 集結，晶片貼在號碼布背面、不要撕掉",
       "跑衣、號碼布賽前宅配，3/22 還沒收到要聯絡客服"
     ]
   },
