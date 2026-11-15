@@ -5,6 +5,7 @@ import { href } from "../router";
 import type { Race } from "../types";
 import { todayInputValue } from "../utils/dateUtils";
 import {
+  formatDistance,
   formatHeroDistance,
   getChecklistItems,
   getDaysUntil,
@@ -85,6 +86,17 @@ export function RaceMemo({ race }: { race: Race }) {
               )}
             </dd>
           </div>
+          {race.eventMode === "virtual" ? null : (
+            <div className="flex min-h-14 items-center justify-between gap-4 border-b border-line">
+              <dt className="shrink-0 text-[15px] text-muted">配速</dt>
+              <dd className="min-w-0 text-right text-[15px] font-bold">
+                <a href={href.calc(race.id)} className="focus-ring inline-flex min-h-11 items-center gap-1 rounded text-accent-ink">
+                  用 {formatDistance(race.distanceKm)} 試算
+                  <ArrowRight className="h-4 w-4 shrink-0" strokeWidth={2.2} aria-hidden="true" />
+                </a>
+              </dd>
+            </div>
+          )}
         </dl>
 
         {race.memo.length > 0 ? (

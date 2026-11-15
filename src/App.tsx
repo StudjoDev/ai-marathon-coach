@@ -3,6 +3,7 @@ import { RaceList } from "./components/RaceList";
 import { RaceMemo } from "./components/RaceMemo";
 import { RaceRecord } from "./components/RaceRecord";
 import { PhotoGallery } from "./components/PhotoGallery";
+import { PaceCalculator } from "./components/PaceCalculator";
 import { SignIn } from "./components/SignIn";
 import { href } from "./router";
 import { StoreProvider, useStore } from "./data/store";
@@ -23,6 +24,8 @@ function Screens() {
 
   if (!authReady) return <Loading />;
   if (route.name === "login") return <SignIn />;
+  // 計算機不需要賽事資料，後台還沒回應也能用
+  if (route.name === "calc" && !route.id) return <PaceCalculator />;
   if (status === "loading") return <Loading />;
   if (status === "error") return <Message title="無法連到後台" body={error ?? "請稍後再試。"} />;
 
@@ -37,6 +40,8 @@ function Screens() {
       return <RaceRecord key={race.id} race={race} />;
     case "photos":
       return <PhotoGallery key={race.id} race={race} initialPhoto={route.photo} />;
+    case "calc":
+      return <PaceCalculator key={race.id} race={race} />;
     case "edit":
       return canEdit ? <RaceEditor key={race.id} race={race} /> : <SignIn asGate />;
     case "race":

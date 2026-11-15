@@ -1,4 +1,4 @@
-import { ArrowRight, LogIn, Plus } from "lucide-react";
+import { ArrowRight, Calculator, ChevronRight, LogIn, Plus } from "lucide-react";
 import { useStore } from "../data/store";
 import { href } from "../router";
 import type { Race } from "../types";
@@ -57,6 +57,18 @@ export function RaceList() {
         <Stat label="已完成" value={String(finished.length)} />
         <Stat label="已完賽距離" value={finishedKm.toFixed(1)} unit="KM" />
       </dl>
+
+      <a
+        href={href.calc()}
+        className="focus-ring flex min-h-[64px] items-center gap-3 border-b border-line px-5 text-ink transition-colors active:bg-soft"
+      >
+        <Calculator className="h-5 w-5 shrink-0" strokeWidth={2.2} aria-hidden="true" />
+        <span className="min-w-0 flex-1">
+          <span className="block text-base font-bold">配速計算機</span>
+          <span className="block text-[13px] text-muted">距離、時間、配速互相換算</span>
+        </span>
+        <ChevronRight className="h-5 w-5 shrink-0 text-muted" aria-hidden="true" />
+      </a>
 
       <div className="flex flex-col px-5 pb-6 pt-7">
         {upcoming.length > 0 ? (

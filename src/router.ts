@@ -6,6 +6,7 @@ export type Route =
   | { name: "record"; id: string }
   | { name: "edit"; id: string }
   | { name: "photos"; id: string; photo?: string }
+  | { name: "calc"; id?: string }
   | { name: "new" }
   | { name: "login" };
 
@@ -13,10 +14,12 @@ export function parseRoute(hash: string): Route {
   const [, page, id, action, extra] = hash.replace(/^#/, "").split("/");
   if (page === "new") return { name: "new" };
   if (page === "login") return { name: "login" };
+  if (page === "calc") return { name: "calc" };
   if (page === "race" && id) {
     const raceId = decodeURIComponent(id);
     if (action === "record") return { name: "record", id: raceId };
     if (action === "edit") return { name: "edit", id: raceId };
+    if (action === "calc") return { name: "calc", id: raceId };
     if (action === "photos") return { name: "photos", id: raceId, photo: extra ? decodeURIComponent(extra) : undefined };
     return { name: "race", id: raceId };
   }
@@ -30,6 +33,8 @@ export const href = {
   edit: (id: string) => `#/race/${encodeURIComponent(id)}/edit`,
   photos: (id: string, photo?: string) =>
     `#/race/${encodeURIComponent(id)}/photos${photo ? `/${encodeURIComponent(photo)}` : ""}`,
+  /** 帶賽事 id 時會預填那場的距離 */
+  calc: (id?: string) => (id ? `#/race/${encodeURIComponent(id)}/calc` : "#/calc"),
   new: () => "#/new",
   login: () => "#/login"
 };
@@ -50,7 +55,7 @@ function normalizeHash(hash: string) {
   return hash && hash !== "#" ? hash : "#/";
 }
 
-/** 頁面層級：列表 0、賽事 1、紀錄/編輯/照片 2、單張照片 3 */
+/** 頁面層級：列表 0、賽事/計算機 1、紀錄/編輯/照片/賽事計算機 2、單張照片 3 */
 function depthOf(hash: string) {
   const segments = normalizeHash(hash).replace(/^#\/?/, "").split("/").filter(Boolean);
   if (segments.length === 0) return 0;
