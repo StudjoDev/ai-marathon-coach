@@ -18,7 +18,7 @@ export function CertificateSection({ raceId }: { raceId: string }) {
 
       <ul className="grid grid-cols-2 gap-3">
         {certificates.map((certificate) => (
-          <li key={certificate.bib} className="flex min-w-0 flex-col">
+          <li key={certificate.id} className="flex min-w-0 flex-col">
             <a
               href={certificate.fileUrl}
               target="_blank"
@@ -28,7 +28,7 @@ export function CertificateSection({ raceId }: { raceId: string }) {
             >
               <img
                 src={certificate.previewUrl}
-                alt={`${certificate.name} 的完賽證書，號碼 ${certificate.bib}，成績 ${certificate.netTime}`}
+                alt={`${certificate.name} 的完賽證書，${certificate.bib ? `號碼 ${certificate.bib}，` : ""}成績 ${certificate.netTime}`}
                 width={720}
                 height={1018}
                 loading="lazy"
@@ -38,7 +38,8 @@ export function CertificateSection({ raceId }: { raceId: string }) {
             </a>
             <p className="mt-2.5 truncate text-[15px] font-bold">{certificate.name}</p>
             <p className="text-[13px] tabular-nums text-muted">
-              #{certificate.bib} · {certificate.netTime}
+              {certificate.bib ? `#${certificate.bib} · ` : ""}
+              {certificate.netTime}
             </p>
             <a
               href={certificate.fileUrl}
