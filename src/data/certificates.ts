@@ -29,6 +29,13 @@ const raw: Record<string, { label: string; items: RawCertificate[] }> = {
       { id: "chen", name: "陳惠欣", netTime: "1:18:06", ext: "jpg" }
     ]
   },
+  "taoyuan-bald-cypress-2026-11k": {
+    label: "桃園落羽松",
+    items: [
+      { bib: "50115", name: "許仁杰", netTime: "1:15:43", ext: "jpg" },
+      { bib: "60007", name: "陳惠欣", netTime: "1:09:28", ext: "jpg" }
+    ]
+  },
   "marie-claire-pink-run-2026-10k": {
     label: "裙襬澎澎Run",
     items: [
