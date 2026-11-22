@@ -1,5 +1,7 @@
 import type { Race } from "../types";
 import { toDateOnly } from "./dateUtils";
+import { getCertificates } from "../data/certificates";
+import { hasPhotos } from "../data/photos";
 
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const WEEKDAYS = ["週日", "週一", "週二", "週三", "週四", "週五", "週六"];
@@ -16,7 +18,10 @@ export function getDaysUntil(date: string, today: string) {
 
 export function getRaceTiming(race: Race, today: string): RaceTiming {
   if (getDaysUntil(race.endDate ?? race.date, today) < 0) return "past";
-  if (getDaysUntil(race.date, today) <= 0) return "today";
+  if (getDaysUntil(race.date, today) <= 0) {
+    // 比賽當天一放上完賽證書或賽事照片，就當作已結束，移到「已完成」
+    return getCertificates(race.id).length > 0 || hasPhotos(race.id) ? "past" : "today";
+  }
   return "upcoming";
 }
 
