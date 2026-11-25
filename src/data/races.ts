@@ -168,6 +168,23 @@ export const races: Race[] = [
     ]
   },
   {
+    id: "elle-run-2027-10k",
+    name: "2027 ELLE RUN 風格路跑",
+    shortName: "ELLE RUN 10K",
+    date: "2027-04-17",
+    distanceKm: 10,
+    venue: "台北大佳河濱公園 8 號水門圓形廣場",
+    startTime: "待公告",
+    finishLimit: "待公告",
+    officialUrl: "https://bao-ming.com/eb/",
+    checkInSummary: "待行前通知",
+    memo: [
+      "週六比賽，起跑時間與關門時間待官方公告",
+      "會場在 8 號水門圓形廣場，不是行動巨蛋廣場",
+      "報到、物資寄送與寄物方式等行前通知"
+    ]
+  },
+  {
     id: "bali-trail-2027-8k",
     name: "2027 Bali Trail 八里越野",
     shortName: "八里越野 8K",
