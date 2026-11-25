@@ -168,7 +168,7 @@ export const races: Race[] = [
     ]
   },
   {
-    id: "elle-run-2027-10k",
+    id: "2027-04-17-2we0or",
     name: "2027 ELLE RUN 風格路跑",
     shortName: "ELLE RUN 10K",
     date: "2027-04-17",
